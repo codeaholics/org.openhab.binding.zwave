@@ -13,8 +13,8 @@ import static org.junit.Assert.*;
 import java.util.Arrays;
 
 import org.junit.Test;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
-import org.openhab.binding.zwave.internal.protocol.ZWaveSerialMessageException;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
+import org.openhab.binding.zwave.internal.protocol.ZWaveByteMessageException;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveCommandClass.CommandClass;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveVersionCommandClass;
 
@@ -28,7 +28,7 @@ public class ZWaveVersionCommandClassTest extends ZWaveCommandClassTest {
     @Test
     public void getVersionMessage() {
         ZWaveVersionCommandClass cls = (ZWaveVersionCommandClass) getCommandClass(CommandClass.VERSION);
-        SerialMessage msg;
+        ByteMessage msg;
 
         byte[] expectedResponseV1 = { 1, 9, 0, 19, 99, 2, -122, 17, 0, 0, 19 };
         cls.setVersion(1);
@@ -39,7 +39,7 @@ public class ZWaveVersionCommandClassTest extends ZWaveCommandClassTest {
     @Test
     public void setValueMessage() {
         ZWaveVersionCommandClass cls = (ZWaveVersionCommandClass) getCommandClass(CommandClass.VERSION);
-        SerialMessage msg;
+        ByteMessage msg;
 
         byte[] expectedResponseV1 = { 1, 10, 0, 19, 99, 3, -122, 19, 113, 0, 0, 98 };
         cls.setVersion(1);
@@ -53,11 +53,11 @@ public class ZWaveVersionCommandClassTest extends ZWaveCommandClassTest {
                 (byte) 0x7C };
 
         ZWaveVersionCommandClass cls = (ZWaveVersionCommandClass) getCommandClass(CommandClass.VERSION);
-        SerialMessage msg = new SerialMessage(packetData);
+        ByteMessage msg = new ByteMessage(packetData);
         try {
             cls.handleApplicationCommandRequest(msg, 4, 0);
             assertEquals("1.4", cls.getApplicationVersion());
-        } catch (ZWaveSerialMessageException e) {
+        } catch (ZWaveByteMessageException e) {
         }
     }
 }

@@ -16,7 +16,7 @@ import org.eclipse.smarthome.core.types.Command;
 import org.eclipse.smarthome.core.types.State;
 import org.openhab.binding.zwave.handler.ZWaveControllerHandler;
 import org.openhab.binding.zwave.handler.ZWaveThingChannel;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
 import org.openhab.binding.zwave.internal.protocol.ZWaveNode;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveCommandClass;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveDoorLockCommandClass;
@@ -43,7 +43,7 @@ public class ZWaveDoorLockConverter extends ZWaveCommandClassConverter {
      * {@inheritDoc}
      */
     @Override
-    public List<SerialMessage> executeRefresh(ZWaveThingChannel channel, ZWaveNode node) {
+    public List<ByteMessage> executeRefresh(ZWaveThingChannel channel, ZWaveNode node) {
         ZWaveDoorLockCommandClass commandClass = (ZWaveDoorLockCommandClass) node
                 .resolveCommandClass(ZWaveCommandClass.CommandClass.DOOR_LOCK, channel.getEndpoint());
         if (commandClass == null) {
@@ -52,9 +52,9 @@ public class ZWaveDoorLockConverter extends ZWaveCommandClassConverter {
 
         logger.debug("NODE {}: Generating poll message for {} endpoint {}", node.getNodeId(),
                 commandClass.getCommandClass().getLabel(), channel.getEndpoint());
-        SerialMessage serialMessage = node.encapsulate(commandClass.getValueMessage(), commandClass,
+        ByteMessage serialMessage = node.encapsulate(commandClass.getValueMessage(), commandClass,
                 channel.getEndpoint());
-        List<SerialMessage> response = new ArrayList<SerialMessage>(1);
+        List<ByteMessage> response = new ArrayList<ByteMessage>(1);
         response.add(serialMessage);
         return response;
     }
@@ -85,7 +85,7 @@ public class ZWaveDoorLockConverter extends ZWaveCommandClassConverter {
      * {@inheritDoc}
      */
     @Override
-    public List<SerialMessage> receiveCommand(ZWaveThingChannel channel, ZWaveNode node, Command command) {
+    public List<ByteMessage> receiveCommand(ZWaveThingChannel channel, ZWaveNode node, Command command) {
         ZWaveDoorLockCommandClass commandClass = (ZWaveDoorLockCommandClass) node
                 .resolveCommandClass(ZWaveCommandClass.CommandClass.DOOR_LOCK, channel.getEndpoint());
 
@@ -99,7 +99,7 @@ public class ZWaveDoorLockConverter extends ZWaveCommandClassConverter {
         if (value > 0) {
             value = 0xff;
         }
-        SerialMessage serialMessage = node.encapsulate(commandClass.setValueMessage(value), commandClass,
+        ByteMessage serialMessage = node.encapsulate(commandClass.setValueMessage(value), commandClass,
                 channel.getEndpoint());
 
         if (serialMessage == null) {
@@ -108,7 +108,7 @@ public class ZWaveDoorLockConverter extends ZWaveCommandClassConverter {
             return null;
         }
 
-        List<SerialMessage> messages = new ArrayList<SerialMessage>();
+        List<ByteMessage> messages = new ArrayList<ByteMessage>();
         messages.add(serialMessage);
         return messages;
     }

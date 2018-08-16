@@ -14,7 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Test;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveCommandClass.CommandClass;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveSwitchAllCommandClass;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveSwitchAllCommandClass.SwitchAllMode;
@@ -31,7 +31,7 @@ public class ZWaveSwitchAllCommandClassTest extends ZWaveCommandClassTest {
     @Test
     public void getValueMessage() {
         ZWaveSwitchAllCommandClass cls = (ZWaveSwitchAllCommandClass) getCommandClass(CommandClass.SWITCH_ALL);
-        SerialMessage msg;
+        ByteMessage msg;
 
         byte[] expectedResponseV1 = { 1, 9, 0, 19, 99, 2, 39, 2, 0, 0, -95 };
         cls.setVersion(1);
@@ -42,7 +42,7 @@ public class ZWaveSwitchAllCommandClassTest extends ZWaveCommandClassTest {
     @Test
     public void setValueMessage() {
         ZWaveSwitchAllCommandClass cls = (ZWaveSwitchAllCommandClass) getCommandClass(CommandClass.SWITCH_ALL);
-        SerialMessage msg;
+        ByteMessage msg;
 
         byte[] expectedResponseV1 = { 1, 10, 0, 19, 99, 3, 39, 1, 2, 0, 0, -94 };
         cls.setVersion(1);
@@ -53,7 +53,7 @@ public class ZWaveSwitchAllCommandClassTest extends ZWaveCommandClassTest {
     @Test
     public void allOnMessage() {
         ZWaveSwitchAllCommandClass cls = (ZWaveSwitchAllCommandClass) getCommandClass(CommandClass.SWITCH_ALL);
-        SerialMessage msg;
+        ByteMessage msg;
 
         byte[] expectedResponseV1 = { 1, 9, 0, 19, 99, 2, 39, 4, 0, 0, -89 };
         cls.setVersion(1);
@@ -64,7 +64,7 @@ public class ZWaveSwitchAllCommandClassTest extends ZWaveCommandClassTest {
     @Test
     public void allOffMessage() {
         ZWaveSwitchAllCommandClass cls = (ZWaveSwitchAllCommandClass) getCommandClass(CommandClass.SWITCH_ALL);
-        SerialMessage msg;
+        ByteMessage msg;
 
         byte[] expectedResponseV1 = { 1, 9, 0, 19, 99, 2, 39, 5, 0, 0, -90 };
         cls.setVersion(1);

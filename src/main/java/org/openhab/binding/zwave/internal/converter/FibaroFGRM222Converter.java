@@ -20,7 +20,7 @@ import org.eclipse.smarthome.core.types.State;
 import org.openhab.binding.zwave.handler.ZWaveControllerHandler;
 import org.openhab.binding.zwave.handler.ZWaveThingChannel;
 import org.openhab.binding.zwave.handler.ZWaveThingChannel.DataType;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
 import org.openhab.binding.zwave.internal.protocol.ZWaveNode;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveCommandClass;
 import org.openhab.binding.zwave.internal.protocol.commandclass.proprietary.FibaroFGRM222CommandClass;
@@ -59,13 +59,13 @@ public class FibaroFGRM222Converter extends ZWaveCommandClassConverter {
     }
 
     @Override
-    public List<SerialMessage> receiveCommand(ZWaveThingChannel channel, ZWaveNode node, Command command) {
+    public List<ByteMessage> receiveCommand(ZWaveThingChannel channel, ZWaveNode node, Command command) {
         FibaroFGRM222CommandClass commandClass = (FibaroFGRM222CommandClass) node
                 .resolveCommandClass(ZWaveCommandClass.CommandClass.FIBARO_FGRM_222, channel.getEndpoint());
 
         logger.debug("NODE {}: receiveCommand()", node.getNodeId());
         Command internalCommand = command;
-        SerialMessage serialMessage = null;
+        ByteMessage serialMessage = null;
 
         if (internalCommand instanceof StopMoveType && (StopMoveType) internalCommand == StopMoveType.STOP) {
             // Special handling for the STOP command
@@ -113,7 +113,7 @@ public class FibaroFGRM222Converter extends ZWaveCommandClassConverter {
             return null;
         }
 
-        List<SerialMessage> messages = new ArrayList<SerialMessage>();
+        List<ByteMessage> messages = new ArrayList<ByteMessage>();
         messages.add(serialMessage);
         return messages;
     }

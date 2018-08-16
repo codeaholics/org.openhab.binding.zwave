@@ -8,11 +8,11 @@
  */
 package org.openhab.binding.zwave.internal.protocol.commandclass.proprietary;
 
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
 import org.openhab.binding.zwave.internal.protocol.ZWaveController;
 import org.openhab.binding.zwave.internal.protocol.ZWaveEndpoint;
 import org.openhab.binding.zwave.internal.protocol.ZWaveNode;
-import org.openhab.binding.zwave.internal.protocol.ZWaveSerialMessageException;
+import org.openhab.binding.zwave.internal.protocol.ZWaveByteMessageException;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveCommandClass;
 import org.openhab.binding.zwave.internal.protocol.event.ZWaveCommandClassValueEvent;
 import org.slf4j.Logger;
@@ -40,8 +40,8 @@ public class FibaroFGRM222CommandClass extends ZWaveCommandClass {
     }
 
     @Override
-    public void handleApplicationCommandRequest(final SerialMessage serialMessage, final int offset, final int endpoint)
-            throws ZWaveSerialMessageException {
+    public void handleApplicationCommandRequest(final ByteMessage serialMessage, final int offset, final int endpoint)
+            throws ZWaveByteMessageException {
         logger.debug("NODE {}: handleApplicationCommandRequest: {}", this.getNode().getNodeId(),
                 serialMessage.toString());
 
@@ -59,12 +59,12 @@ public class FibaroFGRM222CommandClass extends ZWaveCommandClass {
         this.getController().notifyEventListeners(lamellaEvent);
     }
 
-    public SerialMessage setValueMessage(final int level, final String type) {
+    public ByteMessage setValueMessage(final int level, final String type) {
         logger.debug("NODE {}: Creating new message for application command FIBARO FGRM 222 set. type: {}. level {}.",
                 this.getNode().getNodeId(), type, level);
-        SerialMessage result = new SerialMessage(this.getNode().getNodeId(), SerialMessage.SerialMessageClass.SendData,
-                SerialMessage.SerialMessageType.Request, SerialMessage.SerialMessageClass.SendData,
-                SerialMessage.SerialMessagePriority.Set);
+        ByteMessage result = new ByteMessage(this.getNode().getNodeId(), ByteMessage.MessageClass.SendData,
+                ByteMessage.ByteMessageType.Request, ByteMessage.MessageClass.SendData,
+                ByteMessage.ByteMessagePriority.Set);
         byte[] newPayload;
         if (type.equalsIgnoreCase(FibaroFGRM222ValueType.Shutter.name())) {
             newPayload = new byte[] { (byte) this.getNode().getNodeId(), // Node ID of Target Node
@@ -92,7 +92,7 @@ public class FibaroFGRM222CommandClass extends ZWaveCommandClass {
      *
      * @return the serial message
      */
-    public SerialMessage stopLevelChangeMessage(final String type) {
+    public ByteMessage stopLevelChangeMessage(final String type) {
         // logger.debug("Creating new stop message for application command FIBARO FGRM 222 set for node {}. type: {}.
         // level {}.",
         // this.getNode().getNodeId(), type);
@@ -131,9 +131,9 @@ public class FibaroFGRM222CommandClass extends ZWaveCommandClass {
         // return result;
         logger.debug("NODE {}: Creating new message for application command SWITCH_MULTILEVEL_STOP_LEVEL_CHANGE",
                 this.getNode().getNodeId());
-        SerialMessage result = new SerialMessage(this.getNode().getNodeId(), SerialMessage.SerialMessageClass.SendData,
-                SerialMessage.SerialMessageType.Request, SerialMessage.SerialMessageClass.SendData,
-                SerialMessage.SerialMessagePriority.Set);
+        ByteMessage result = new ByteMessage(this.getNode().getNodeId(), ByteMessage.MessageClass.SendData,
+                ByteMessage.ByteMessageType.Request, ByteMessage.MessageClass.SendData,
+                ByteMessage.ByteMessagePriority.Set);
         byte[] newPayload = { (byte) this.getNode().getNodeId(), 2, (byte) CommandClass.SWITCH_MULTILEVEL.getKey(),
                 (byte) 0x05 };
         result.setMessagePayload(newPayload);

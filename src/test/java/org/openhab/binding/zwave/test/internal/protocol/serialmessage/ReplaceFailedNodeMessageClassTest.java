@@ -13,8 +13,8 @@ import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 
 import org.junit.Test;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
-import org.openhab.binding.zwave.internal.protocol.serialmessage.ReplaceFailedNodeMessageClass;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
+import org.openhab.binding.zwave.internal.protocol.messages.ReplaceFailedNodeMessageClass;
 
 /**
  * Test cases for ReplaceFailedNodeMessageClass message.
@@ -29,7 +29,7 @@ public class ReplaceFailedNodeMessageClassTest {
         byte[] expectedResponse = { 1, 5, 0, 99, 12, 1, -108 };
 
         ReplaceFailedNodeMessageClass handler = new ReplaceFailedNodeMessageClass();
-        SerialMessage msg = handler.doRequest(12);
+        ByteMessage msg = handler.doRequest(12);
 
         assertTrue(Arrays.equals(msg.getMessageBuffer(), expectedResponse));
     }

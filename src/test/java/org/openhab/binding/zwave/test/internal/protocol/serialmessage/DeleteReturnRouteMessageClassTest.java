@@ -13,8 +13,8 @@ import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 
 import org.junit.Test;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
-import org.openhab.binding.zwave.internal.protocol.serialmessage.DeleteReturnRouteMessageClass;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
+import org.openhab.binding.zwave.internal.protocol.messages.DeleteReturnRouteMessageClass;
 
 /**
  * Test cases for DeleteReturnRouteMessageClass message.
@@ -29,7 +29,7 @@ public class DeleteReturnRouteMessageClassTest {
         byte[] expectedResponse = { 1, 5, 0, 71, 12, 1, -80 };
 
         DeleteReturnRouteMessageClass handler = new DeleteReturnRouteMessageClass();
-        SerialMessage msg = handler.doRequest(12);
+        ByteMessage msg = handler.doRequest(12);
 
         assertTrue(Arrays.equals(msg.getMessageBuffer(), expectedResponse));
     }

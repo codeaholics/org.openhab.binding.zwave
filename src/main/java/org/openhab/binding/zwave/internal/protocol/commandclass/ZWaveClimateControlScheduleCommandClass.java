@@ -13,11 +13,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
 import org.openhab.binding.zwave.internal.protocol.ZWaveController;
 import org.openhab.binding.zwave.internal.protocol.ZWaveEndpoint;
 import org.openhab.binding.zwave.internal.protocol.ZWaveNode;
-import org.openhab.binding.zwave.internal.protocol.ZWaveSerialMessageException;
+import org.openhab.binding.zwave.internal.protocol.ZWaveByteMessageException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,11 +69,11 @@ public class ZWaveClimateControlScheduleCommandClass extends ZWaveCommandClass {
     /**
      * {@inheritDoc}
      *
-     * @throws ZWaveSerialMessageException
+     * @throws ZWaveByteMessageException
      */
     @Override
-    public void handleApplicationCommandRequest(SerialMessage serialMessage, int offset, int endpoint)
-            throws ZWaveSerialMessageException {
+    public void handleApplicationCommandRequest(ByteMessage serialMessage, int offset, int endpoint)
+            throws ZWaveByteMessageException {
         logger.debug("NODE {}: Received CLIMATE_CONTROL_SCHEDULE command V{}", this.getNode().getNodeId(),
                 this.getVersion());
         int command = serialMessage.getMessagePayloadByte(offset);
@@ -98,12 +98,12 @@ public class ZWaveClimateControlScheduleCommandClass extends ZWaveCommandClass {
     }
 
     // Visible for Testing
-    public SerialMessage getScheduleChangedReportMessage(byte scheduleChangeCounter) {
+    public ByteMessage getScheduleChangedReportMessage(byte scheduleChangeCounter) {
         logger.debug("NODE {}: Creating new message for command SCHEDULE_CHANGED_REPORT", getNode().getNodeId());
 
-        SerialMessage result = new SerialMessage(getNode().getNodeId(), SerialMessage.SerialMessageClass.SendData,
-                SerialMessage.SerialMessageType.Request, SerialMessage.SerialMessageClass.SendData,
-                SerialMessage.SerialMessagePriority.RealTime);
+        ByteMessage result = new ByteMessage(getNode().getNodeId(), ByteMessage.MessageClass.SendData,
+                ByteMessage.ByteMessageType.Request, ByteMessage.MessageClass.SendData,
+                ByteMessage.ByteMessagePriority.RealTime);
 
         ByteArrayOutputStream outputData = new ByteArrayOutputStream();
         outputData.write(getNode().getNodeId());

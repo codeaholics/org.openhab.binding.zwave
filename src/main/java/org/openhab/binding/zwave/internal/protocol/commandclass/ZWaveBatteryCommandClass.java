@@ -12,14 +12,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage.SerialMessageClass;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage.SerialMessagePriority;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage.SerialMessageType;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage.MessageClass;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage.ByteMessagePriority;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage.ByteMessageType;
 import org.openhab.binding.zwave.internal.protocol.ZWaveController;
 import org.openhab.binding.zwave.internal.protocol.ZWaveEndpoint;
 import org.openhab.binding.zwave.internal.protocol.ZWaveNode;
-import org.openhab.binding.zwave.internal.protocol.ZWaveSerialMessageException;
+import org.openhab.binding.zwave.internal.protocol.ZWaveByteMessageException;
 import org.openhab.binding.zwave.internal.protocol.event.ZWaveCommandClassValueEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,11 +75,11 @@ public class ZWaveBatteryCommandClass extends ZWaveCommandClass
     /**
      * {@inheritDoc}
      *
-     * @throws ZWaveSerialMessageException
+     * @throws ZWaveByteMessageException
      */
     @Override
-    public void handleApplicationCommandRequest(SerialMessage serialMessage, int offset, int endpoint)
-            throws ZWaveSerialMessageException {
+    public void handleApplicationCommandRequest(ByteMessage serialMessage, int offset, int endpoint)
+            throws ZWaveByteMessageException {
         logger.debug("NODE {}: Received Battery Request", this.getNode().getNodeId());
         int command = serialMessage.getMessagePayloadByte(offset);
         switch (command) {
@@ -122,15 +122,15 @@ public class ZWaveBatteryCommandClass extends ZWaveCommandClass
      * @return the serial message
      */
     @Override
-    public SerialMessage getValueMessage() {
+    public ByteMessage getValueMessage() {
         if (isGetSupported == false) {
             logger.debug("NODE {}: Node doesn't support get requests", this.getNode().getNodeId());
             return null;
         }
 
         logger.debug("NODE {}: Creating new message for application command BATTERY_GET", this.getNode().getNodeId());
-        SerialMessage result = new SerialMessage(this.getNode().getNodeId(), SerialMessageClass.SendData,
-                SerialMessageType.Request, SerialMessageClass.ApplicationCommandHandler, SerialMessagePriority.Get);
+        ByteMessage result = new ByteMessage(this.getNode().getNodeId(), MessageClass.SendData,
+                ByteMessageType.Request, MessageClass.ApplicationCommandHandler, ByteMessagePriority.Get);
         byte[] newPayload = { (byte) this.getNode().getNodeId(), 2, (byte) getCommandClass().getKey(),
                 (byte) BATTERY_GET };
         result.setMessagePayload(newPayload);
@@ -150,7 +150,7 @@ public class ZWaveBatteryCommandClass extends ZWaveCommandClass
      * {@inheritDoc}
      */
     @Override
-    public Collection<SerialMessage> getDynamicValues(boolean refresh) {
+    public Collection<ByteMessage> getDynamicValues(boolean refresh) {
         if (refresh == true) {
             dynamicDone = false;
         }
@@ -159,7 +159,7 @@ public class ZWaveBatteryCommandClass extends ZWaveCommandClass
             return null;
         }
 
-        ArrayList<SerialMessage> result = new ArrayList<SerialMessage>();
+        ArrayList<ByteMessage> result = new ArrayList<ByteMessage>();
         result.add(getValueMessage());
         return result;
     }

@@ -15,14 +15,14 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage.SerialMessageClass;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage.SerialMessagePriority;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage.SerialMessageType;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage.MessageClass;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage.ByteMessagePriority;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage.ByteMessageType;
 import org.openhab.binding.zwave.internal.protocol.ZWaveController;
 import org.openhab.binding.zwave.internal.protocol.ZWaveEndpoint;
 import org.openhab.binding.zwave.internal.protocol.ZWaveNode;
-import org.openhab.binding.zwave.internal.protocol.ZWaveSerialMessageException;
+import org.openhab.binding.zwave.internal.protocol.ZWaveByteMessageException;
 import org.openhab.binding.zwave.internal.protocol.event.ZWaveCommandClassValueEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -88,11 +88,11 @@ public class ZWaveThermostatModeCommandClass extends ZWaveCommandClass
     /**
      * {@inheritDoc}
      *
-     * @throws ZWaveSerialMessageException
+     * @throws ZWaveByteMessageException
      */
     @Override
-    public void handleApplicationCommandRequest(SerialMessage serialMessage, int offset, int endpoint)
-            throws ZWaveSerialMessageException {
+    public void handleApplicationCommandRequest(ByteMessage serialMessage, int offset, int endpoint)
+            throws ZWaveByteMessageException {
         logger.debug("NODE {}: Received Thermostat Mode Request", this.getNode().getNodeId());
         int command = serialMessage.getMessagePayloadByte(offset);
         switch (command) {
@@ -142,10 +142,10 @@ public class ZWaveThermostatModeCommandClass extends ZWaveCommandClass
      * @param serialMessage the incoming message to process.
      * @param offset the offset position from which to start message processing.
      * @param endpoint the endpoint or instance number this message is meant for.
-     * @throws ZWaveSerialMessageException
+     * @throws ZWaveByteMessageException
      */
-    protected void processThermostatModeReport(SerialMessage serialMessage, int offset, int endpoint)
-            throws ZWaveSerialMessageException {
+    protected void processThermostatModeReport(ByteMessage serialMessage, int offset, int endpoint)
+            throws ZWaveByteMessageException {
 
         int value = serialMessage.getMessagePayloadByte(offset + 1);
 
@@ -175,8 +175,8 @@ public class ZWaveThermostatModeCommandClass extends ZWaveCommandClass
      * {@inheritDoc}
      */
     @Override
-    public Collection<SerialMessage> initialize(boolean refresh) {
-        ArrayList<SerialMessage> result = new ArrayList<SerialMessage>();
+    public Collection<ByteMessage> initialize(boolean refresh) {
+        ArrayList<ByteMessage> result = new ArrayList<ByteMessage>();
         if (refresh == true || initialiseDone == false) {
             result.add(this.getSupportedMessage());
         }
@@ -187,8 +187,8 @@ public class ZWaveThermostatModeCommandClass extends ZWaveCommandClass
      * {@inheritDoc}
      */
     @Override
-    public Collection<SerialMessage> getDynamicValues(boolean refresh) {
-        ArrayList<SerialMessage> result = new ArrayList<SerialMessage>();
+    public Collection<ByteMessage> getDynamicValues(boolean refresh) {
+        ArrayList<ByteMessage> result = new ArrayList<ByteMessage>();
         if (refresh == true || dynamicDone == false) {
             result.add(getValueMessage());
         }
@@ -199,7 +199,7 @@ public class ZWaveThermostatModeCommandClass extends ZWaveCommandClass
      * {@inheritDoc}
      */
     @Override
-    public SerialMessage getValueMessage() {
+    public ByteMessage getValueMessage() {
         if (isGetSupported == false) {
             logger.debug("NODE {}: Node doesn't support get requests", this.getNode().getNodeId());
             return null;
@@ -207,8 +207,8 @@ public class ZWaveThermostatModeCommandClass extends ZWaveCommandClass
 
         logger.debug("NODE {}: Creating new message for application command THERMOSTAT_MODE_GET",
                 this.getNode().getNodeId());
-        SerialMessage result = new SerialMessage(this.getNode().getNodeId(), SerialMessageClass.SendData,
-                SerialMessageType.Request, SerialMessageClass.ApplicationCommandHandler, SerialMessagePriority.Get);
+        ByteMessage result = new ByteMessage(this.getNode().getNodeId(), MessageClass.SendData,
+                ByteMessageType.Request, MessageClass.ApplicationCommandHandler, ByteMessagePriority.Get);
         byte[] payload = { (byte) this.getNode().getNodeId(), 2, (byte) getCommandClass().getKey(),
                 THERMOSTAT_MODE_GET };
         result.setMessagePayload(payload);
@@ -229,12 +229,12 @@ public class ZWaveThermostatModeCommandClass extends ZWaveCommandClass
      *
      * @return the serial message, or null if the supported command is not supported.
      */
-    public SerialMessage getSupportedMessage() {
+    public ByteMessage getSupportedMessage() {
         logger.debug("NODE {}: Creating new message for application command THERMOSTAT_MODE_SUPPORTED_GET",
                 this.getNode().getNodeId());
 
-        SerialMessage result = new SerialMessage(this.getNode().getNodeId(), SerialMessageClass.SendData,
-                SerialMessageType.Request, SerialMessageClass.ApplicationCommandHandler, SerialMessagePriority.Config);
+        ByteMessage result = new ByteMessage(this.getNode().getNodeId(), MessageClass.SendData,
+                ByteMessageType.Request, MessageClass.ApplicationCommandHandler, ByteMessagePriority.Config);
         byte[] newPayload = { (byte) this.getNode().getNodeId(), 2, (byte) getCommandClass().getKey(),
                 THERMOSTAT_MODE_SUPPORTED_GET };
         result.setMessagePayload(newPayload);
@@ -245,7 +245,7 @@ public class ZWaveThermostatModeCommandClass extends ZWaveCommandClass
      * {@inheritDoc}
      */
     @Override
-    public SerialMessage setValueMessage(int value) {
+    public ByteMessage setValueMessage(int value) {
 
         logger.debug("NODE {}: setValueMessage {}, modeType empty {}", this.getNode().getNodeId(), value,
                 modeTypes.isEmpty());
@@ -265,8 +265,8 @@ public class ZWaveThermostatModeCommandClass extends ZWaveCommandClass
         logger.debug("NODE {}: Creating new message for application command THERMOSTAT_MODE_SET",
                 this.getNode().getNodeId());
 
-        SerialMessage result = new SerialMessage(this.getNode().getNodeId(), SerialMessageClass.SendData,
-                SerialMessageType.Request, SerialMessageClass.SendData, SerialMessagePriority.Set);
+        ByteMessage result = new ByteMessage(this.getNode().getNodeId(), MessageClass.SendData,
+                ByteMessageType.Request, MessageClass.SendData, ByteMessagePriority.Set);
         byte[] newPayload = { (byte) this.getNode().getNodeId(), 3, (byte) getCommandClass().getKey(),
                 THERMOSTAT_MODE_SET, (byte) value };
         result.setMessagePayload(newPayload);

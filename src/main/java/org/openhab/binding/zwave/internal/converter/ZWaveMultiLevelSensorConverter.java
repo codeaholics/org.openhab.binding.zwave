@@ -16,7 +16,7 @@ import org.eclipse.smarthome.core.library.types.DecimalType;
 import org.eclipse.smarthome.core.types.State;
 import org.openhab.binding.zwave.handler.ZWaveControllerHandler;
 import org.openhab.binding.zwave.handler.ZWaveThingChannel;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
 import org.openhab.binding.zwave.internal.protocol.ZWaveNode;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveCommandClass;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveMultiLevelSensorCommandClass;
@@ -49,7 +49,7 @@ public class ZWaveMultiLevelSensorConverter extends ZWaveCommandClassConverter {
      * {@inheritDoc}
      */
     @Override
-    public List<SerialMessage> executeRefresh(ZWaveThingChannel channel, ZWaveNode node) {
+    public List<ByteMessage> executeRefresh(ZWaveThingChannel channel, ZWaveNode node) {
         ZWaveMultiLevelSensorCommandClass commandClass = (ZWaveMultiLevelSensorCommandClass) node
                 .resolveCommandClass(ZWaveCommandClass.CommandClass.SENSOR_MULTILEVEL, channel.getEndpoint());
         if (commandClass == null) {
@@ -61,7 +61,7 @@ public class ZWaveMultiLevelSensorConverter extends ZWaveCommandClassConverter {
 
         String sensorType = channel.getArguments().get("type");
 
-        SerialMessage serialMessage;
+        ByteMessage serialMessage;
         if (sensorType != null) {
             serialMessage = node.encapsulate(commandClass.getMessage(SensorType.valueOf(sensorType)), commandClass,
                     channel.getEndpoint());
@@ -69,7 +69,7 @@ public class ZWaveMultiLevelSensorConverter extends ZWaveCommandClassConverter {
             serialMessage = node.encapsulate(commandClass.getValueMessage(), commandClass, channel.getEndpoint());
         }
 
-        List<SerialMessage> response = new ArrayList<SerialMessage>(1);
+        List<ByteMessage> response = new ArrayList<ByteMessage>(1);
         response.add(serialMessage);
         return response;
     }

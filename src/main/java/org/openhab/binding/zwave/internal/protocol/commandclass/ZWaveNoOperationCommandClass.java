@@ -8,10 +8,10 @@
  */
 package org.openhab.binding.zwave.internal.protocol.commandclass;
 
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage.SerialMessageClass;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage.SerialMessagePriority;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage.SerialMessageType;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage.MessageClass;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage.ByteMessagePriority;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage.ByteMessageType;
 import org.openhab.binding.zwave.internal.protocol.ZWaveController;
 import org.openhab.binding.zwave.internal.protocol.ZWaveEndpoint;
 import org.openhab.binding.zwave.internal.protocol.ZWaveNode;
@@ -61,7 +61,7 @@ public class ZWaveNoOperationCommandClass extends ZWaveCommandClass {
      * {@inheritDoc}
      */
     @Override
-    public void handleApplicationCommandRequest(SerialMessage serialMessage, int offset, int endpoint) {
+    public void handleApplicationCommandRequest(ByteMessage serialMessage, int offset, int endpoint) {
         logger.debug("NODE {}: Received NO_OPERATION command", getNode().getNodeId());
     }
 
@@ -70,10 +70,10 @@ public class ZWaveNoOperationCommandClass extends ZWaveCommandClass {
      *
      * @return the serial message
      */
-    public SerialMessage getNoOperationMessage() {
+    public ByteMessage getNoOperationMessage() {
         logger.debug("NODE {}: Creating new message for command No Operation", this.getNode().getNodeId());
-        SerialMessage result = new SerialMessage(this.getNode().getNodeId(), SerialMessageClass.SendData,
-                SerialMessageType.Request, SerialMessageClass.SendData, SerialMessagePriority.Poll);
+        ByteMessage result = new ByteMessage(this.getNode().getNodeId(), MessageClass.SendData,
+                ByteMessageType.Request, MessageClass.SendData, ByteMessagePriority.Poll);
         byte[] newPayload = { (byte) this.getNode().getNodeId(), 1, (byte) getCommandClass().getKey() };
         result.setMessagePayload(newPayload);
         return result;

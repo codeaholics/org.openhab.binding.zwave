@@ -9,7 +9,7 @@ import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.openhab.binding.zwave.internal.converter.ZWaveCommandClassConverter;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
 import org.openhab.binding.zwave.internal.protocol.ZWaveController;
 import org.openhab.binding.zwave.internal.protocol.ZWaveNode;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveCommandClass;
@@ -26,7 +26,7 @@ public class ZWaveCommandClassConverterTest {
         final Map<Integer, ZWaveCommandClass> classes = new HashMap<Integer, ZWaveCommandClass>();
         final ZWaveNode node = Mockito.mock(ZWaveNode.class);
         final ZWaveController controller = Mockito.mock(ZWaveController.class);
-        Mockito.when(node.encapsulate(Matchers.any(SerialMessage.class), Matchers.any(ZWaveCommandClass.class),
+        Mockito.when(node.encapsulate(Matchers.any(ByteMessage.class), Matchers.any(ZWaveCommandClass.class),
                 Matchers.anyInt())).then(AdditionalAnswers.returnsFirstArg());
 
         Mockito.when(node.resolveCommandClass(Matchers.any(CommandClass.class), Matchers.anyInt()))

@@ -15,14 +15,14 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage.SerialMessageClass;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage.SerialMessagePriority;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage.SerialMessageType;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage.MessageClass;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage.ByteMessagePriority;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage.ByteMessageType;
 import org.openhab.binding.zwave.internal.protocol.ZWaveController;
 import org.openhab.binding.zwave.internal.protocol.ZWaveEndpoint;
 import org.openhab.binding.zwave.internal.protocol.ZWaveNode;
-import org.openhab.binding.zwave.internal.protocol.ZWaveSerialMessageException;
+import org.openhab.binding.zwave.internal.protocol.ZWaveByteMessageException;
 import org.openhab.binding.zwave.internal.protocol.event.ZWaveCommandClassValueEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -113,11 +113,11 @@ public class ZWaveNodeNamingCommandClass extends ZWaveCommandClass implements ZW
     /**
      * {@inheritDoc}
      *
-     * @throws ZWaveSerialMessageException
+     * @throws ZWaveByteMessageException
      */
     @Override
-    public void handleApplicationCommandRequest(SerialMessage serialMessage, int offset, int endpoint)
-            throws ZWaveSerialMessageException {
+    public void handleApplicationCommandRequest(ByteMessage serialMessage, int offset, int endpoint)
+            throws ZWaveByteMessageException {
         logger.debug("NODE {}: Received NODE_NAMING command V{}", getNode().getNodeId(), getVersion());
         int command = serialMessage.getMessagePayloadByte(offset);
         switch (command) {
@@ -145,9 +145,9 @@ public class ZWaveNodeNamingCommandClass extends ZWaveCommandClass implements ZW
      * @param serialMessage
      * @param offset
      * @return String
-     * @throws ZWaveSerialMessageException
+     * @throws ZWaveByteMessageException
      */
-    protected String getString(SerialMessage serialMessage, int offset) throws ZWaveSerialMessageException {
+    protected String getString(ByteMessage serialMessage, int offset) throws ZWaveByteMessageException {
         if (serialMessage.getMessagePayload().length <= offset + 1) {
             return new String();
         }
@@ -249,10 +249,10 @@ public class ZWaveNodeNamingCommandClass extends ZWaveCommandClass implements ZW
      * @param serialMessage the incoming message to process.
      * @param offset the offset position from which to start message processing.
      * @param endpoint the endpoint or instance number this message is meant for.
-     * @throws ZWaveSerialMessageException
+     * @throws ZWaveByteMessageException
      */
-    protected void processNameReport(SerialMessage serialMessage, int offset, int endpoint)
-            throws ZWaveSerialMessageException {
+    protected void processNameReport(ByteMessage serialMessage, int offset, int endpoint)
+            throws ZWaveByteMessageException {
         String name = getString(serialMessage, offset);
         if (name == null) {
             return;
@@ -271,10 +271,10 @@ public class ZWaveNodeNamingCommandClass extends ZWaveCommandClass implements ZW
      * @param serialMessage the incoming message to process.
      * @param offset the offset position from which to start message processing.
      * @param endpoint the endpoint or instance number this message is meant for.
-     * @throws ZWaveSerialMessageException
+     * @throws ZWaveByteMessageException
      */
-    protected void processLocationReport(SerialMessage serialMessage, int offset, int endpoint)
-            throws ZWaveSerialMessageException {
+    protected void processLocationReport(ByteMessage serialMessage, int offset, int endpoint)
+            throws ZWaveByteMessageException {
         String location = getString(serialMessage, offset);
         if (name == null) {
             return;
@@ -292,10 +292,10 @@ public class ZWaveNodeNamingCommandClass extends ZWaveCommandClass implements ZW
      *
      * @return the serial message
      */
-    public SerialMessage getNameMessage() {
+    public ByteMessage getNameMessage() {
         logger.debug("NODE {}: Creating new message for application command NAME_GET", getNode().getNodeId());
-        SerialMessage result = new SerialMessage(getNode().getNodeId(), SerialMessageClass.SendData,
-                SerialMessageType.Request, SerialMessageClass.ApplicationCommandHandler, SerialMessagePriority.Get);
+        ByteMessage result = new ByteMessage(getNode().getNodeId(), MessageClass.SendData,
+                ByteMessageType.Request, MessageClass.ApplicationCommandHandler, ByteMessagePriority.Get);
         byte[] newPayload = { (byte) getNode().getNodeId(), 2, (byte) getCommandClass().getKey(), (byte) NAME_GET };
         result.setMessagePayload(newPayload);
         return result;
@@ -306,10 +306,10 @@ public class ZWaveNodeNamingCommandClass extends ZWaveCommandClass implements ZW
      *
      * @return the serial message
      */
-    public SerialMessage getLocationMessage() {
+    public ByteMessage getLocationMessage() {
         logger.debug("NODE {}: Creating new message for application command LOCATION_GET", getNode().getNodeId());
-        SerialMessage result = new SerialMessage(getNode().getNodeId(), SerialMessageClass.SendData,
-                SerialMessageType.Request, SerialMessageClass.ApplicationCommandHandler, SerialMessagePriority.Get);
+        ByteMessage result = new ByteMessage(getNode().getNodeId(), MessageClass.SendData,
+                ByteMessageType.Request, MessageClass.ApplicationCommandHandler, ByteMessagePriority.Get);
         byte[] newPayload = { (byte) getNode().getNodeId(), 2, (byte) getCommandClass().getKey(), (byte) LOCATION_GET };
         result.setMessagePayload(newPayload);
         return result;
@@ -321,7 +321,7 @@ public class ZWaveNodeNamingCommandClass extends ZWaveCommandClass implements ZW
      * @param the level to set.
      * @return the serial message
      */
-    private SerialMessage setValueMessage(String str, int command) {
+    private ByteMessage setValueMessage(String str, int command) {
         logger.debug("NODE {}: Creating new message for application command NAME_SET to {}", getNode().getNodeId(),
                 str);
 
@@ -342,8 +342,8 @@ public class ZWaveNodeNamingCommandClass extends ZWaveCommandClass implements ZW
             len = 16;
         }
 
-        SerialMessage result = new SerialMessage(getNode().getNodeId(), SerialMessageClass.SendData,
-                SerialMessageType.Request, SerialMessageClass.SendData, SerialMessagePriority.Set);
+        ByteMessage result = new ByteMessage(getNode().getNodeId(), MessageClass.SendData,
+                ByteMessageType.Request, MessageClass.SendData, ByteMessagePriority.Set);
         byte[] newPayload = { (byte) getNode().getNodeId(), (byte) ((byte) len + 3), (byte) getCommandClass().getKey(),
                 (byte) command, encoding };
 
@@ -355,17 +355,17 @@ public class ZWaveNodeNamingCommandClass extends ZWaveCommandClass implements ZW
         return result;
     }
 
-    public SerialMessage setNameMessage(String name) {
+    public ByteMessage setNameMessage(String name) {
         return setValueMessage(name, NAME_SET);
     }
 
-    public SerialMessage setLocationMessage(String location) {
+    public ByteMessage setLocationMessage(String location) {
         return setValueMessage(location, LOCATION_SET);
     }
 
     @Override
-    public Collection<SerialMessage> getDynamicValues(boolean refresh) {
-        ArrayList<SerialMessage> result = new ArrayList<SerialMessage>();
+    public Collection<ByteMessage> getDynamicValues(boolean refresh) {
+        ArrayList<ByteMessage> result = new ArrayList<ByteMessage>();
 
         if (refresh == true) {
             initialiseName = false;

@@ -13,7 +13,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 
 import org.junit.Test;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveBatteryCommandClass;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveCommandClass.CommandClass;
 
@@ -27,7 +27,7 @@ public class ZWaveBatteryCommandClassTest extends ZWaveCommandClassTest {
     @Test
     public void getValueMessage() {
         ZWaveBatteryCommandClass cls = (ZWaveBatteryCommandClass) getCommandClass(CommandClass.BATTERY);
-        SerialMessage msg;
+        ByteMessage msg;
 
         byte[] expectedResponseV1 = { 1, 9, 0, 19, 99, 2, -128, 2, 0, 0, 6 };
         cls.setVersion(1);

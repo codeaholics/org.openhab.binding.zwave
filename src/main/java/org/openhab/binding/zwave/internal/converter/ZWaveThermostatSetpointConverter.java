@@ -17,7 +17,7 @@ import org.eclipse.smarthome.core.types.Command;
 import org.eclipse.smarthome.core.types.State;
 import org.openhab.binding.zwave.handler.ZWaveControllerHandler;
 import org.openhab.binding.zwave.handler.ZWaveThingChannel;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
 import org.openhab.binding.zwave.internal.protocol.ZWaveNode;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveCommandClass;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveThermostatSetpointCommandClass;
@@ -52,7 +52,7 @@ public class ZWaveThermostatSetpointConverter extends ZWaveCommandClassConverter
      * {@inheritDoc}
      */
     @Override
-    public List<SerialMessage> executeRefresh(ZWaveThingChannel channel, ZWaveNode node) {
+    public List<ByteMessage> executeRefresh(ZWaveThingChannel channel, ZWaveNode node) {
         ZWaveThermostatSetpointCommandClass commandClass = (ZWaveThermostatSetpointCommandClass) node
                 .resolveCommandClass(ZWaveCommandClass.CommandClass.THERMOSTAT_SETPOINT, channel.getEndpoint());
         if (commandClass == null) {
@@ -64,7 +64,7 @@ public class ZWaveThermostatSetpointConverter extends ZWaveCommandClassConverter
 
         String setpointType = channel.getArguments().get("type");
 
-        SerialMessage serialMessage;
+        ByteMessage serialMessage;
         if (setpointType != null) {
             serialMessage = node.encapsulate(commandClass.getMessage(SetpointType.getSetpointType(setpointType)),
                     commandClass, channel.getEndpoint());
@@ -72,7 +72,7 @@ public class ZWaveThermostatSetpointConverter extends ZWaveCommandClassConverter
             serialMessage = node.encapsulate(commandClass.getValueMessage(), commandClass, channel.getEndpoint());
         }
 
-        List<SerialMessage> response = new ArrayList<SerialMessage>(1);
+        List<ByteMessage> response = new ArrayList<ByteMessage>(1);
         response.add(serialMessage);
         return response;
     }
@@ -104,7 +104,7 @@ public class ZWaveThermostatSetpointConverter extends ZWaveCommandClassConverter
      * {@inheritDoc}
      */
     @Override
-    public List<SerialMessage> receiveCommand(ZWaveThingChannel channel, ZWaveNode node, Command command) {
+    public List<ByteMessage> receiveCommand(ZWaveThingChannel channel, ZWaveNode node, Command command) {
         String scaleString = channel.getArguments().get("config_scale");
         String setpointType = channel.getArguments().get("type");
 
@@ -118,7 +118,7 @@ public class ZWaveThermostatSetpointConverter extends ZWaveCommandClassConverter
         ZWaveThermostatSetpointCommandClass commandClass = (ZWaveThermostatSetpointCommandClass) node
                 .resolveCommandClass(ZWaveCommandClass.CommandClass.THERMOSTAT_SETPOINT, channel.getEndpoint());
 
-        SerialMessage serialMessage;
+        ByteMessage serialMessage;
 
         BigDecimal value = ((DecimalType) command).toBigDecimal();
         if (setpointType != null) {
@@ -136,7 +136,7 @@ public class ZWaveThermostatSetpointConverter extends ZWaveCommandClassConverter
         }
 
         logger.debug("NODE {}: Sending Message: {}", node.getNodeId(), serialMessage);
-        List<SerialMessage> messages = new ArrayList<SerialMessage>();
+        List<ByteMessage> messages = new ArrayList<ByteMessage>();
         messages.add(serialMessage);
 
         // Request an update so that OH knows when the setpoint has changed.

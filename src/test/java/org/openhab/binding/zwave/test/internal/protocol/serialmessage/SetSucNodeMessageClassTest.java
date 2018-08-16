@@ -13,9 +13,9 @@ import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 
 import org.junit.Test;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
-import org.openhab.binding.zwave.internal.protocol.serialmessage.SetSucNodeMessageClass;
-import org.openhab.binding.zwave.internal.protocol.serialmessage.SetSucNodeMessageClass.SUCType;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
+import org.openhab.binding.zwave.internal.protocol.messages.SetSucNodeMessageClass;
+import org.openhab.binding.zwave.internal.protocol.messages.SetSucNodeMessageClass.SUCType;
 
 /**
  * Test cases for SetSucNodeMessageClass message.
@@ -30,7 +30,7 @@ public class SetSucNodeMessageClassTest {
         byte[] expectedResponseNone = { 1, 8, 0, 84, 12, 1, 0, 0, 1, -81 };
         byte[] expectedResponseBasic = { 1, 8, 0, 84, 12, 0, 0, 0, 1, -82 };
 
-        SerialMessage msg;
+        ByteMessage msg;
         SetSucNodeMessageClass handler = new SetSucNodeMessageClass();
 
         msg = handler.doRequest(12, SUCType.BASIC);

@@ -5,7 +5,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 
 import org.junit.Test;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
 import org.openhab.binding.zwave.internal.protocol.ZWaveController;
 import org.openhab.binding.zwave.internal.protocol.ZWaveEndpoint;
 import org.openhab.binding.zwave.internal.protocol.ZWaveNode;
@@ -27,7 +27,7 @@ public class ZWaveNodeTest {
         node.addCommandClass(new ZWaveAssociationCommandClass(node, controller, endpoint));
         node.addCommandClass(new ZWaveMultiAssociationCommandClass(node, controller, endpoint));
 
-        SerialMessage msg;
+        ByteMessage msg;
         byte[] expectedResponse;
 
         // Setting device endpoint null and receive endpoint 0 should use single instance

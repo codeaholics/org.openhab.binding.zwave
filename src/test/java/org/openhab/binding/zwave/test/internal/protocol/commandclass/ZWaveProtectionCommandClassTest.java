@@ -15,7 +15,7 @@ import java.util.List;
 
 import org.junit.Ignore;
 import org.junit.Test;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveCommandClass.CommandClass;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveProtectionCommandClass;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveProtectionCommandClass.LocalProtectionType;
@@ -86,7 +86,7 @@ public class ZWaveProtectionCommandClassTest extends ZWaveCommandClassTest {
         cls.setVersion(cls.getMaxVersion());
 
         byte[] expectedResponse = { 99, 4, 117, 1, 1, 2 };
-        SerialMessage msg = cls.setValueMessage(LocalProtectionType.SEQUENCE, RfProtectionType.NORFRESPONSE);
+        ByteMessage msg = cls.setValueMessage(LocalProtectionType.SEQUENCE, RfProtectionType.NORFRESPONSE);
 
         assertTrue(Arrays.equals(msg.getMessagePayload(), expectedResponse));
     }

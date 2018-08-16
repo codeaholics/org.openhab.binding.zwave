@@ -18,15 +18,15 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage.SerialMessageClass;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage.SerialMessagePriority;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage.SerialMessageType;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage.MessageClass;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage.ByteMessagePriority;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage.ByteMessageType;
 import org.openhab.binding.zwave.internal.protocol.ZWaveAssociationGroup;
 import org.openhab.binding.zwave.internal.protocol.ZWaveController;
 import org.openhab.binding.zwave.internal.protocol.ZWaveEndpoint;
 import org.openhab.binding.zwave.internal.protocol.ZWaveNode;
-import org.openhab.binding.zwave.internal.protocol.ZWaveSerialMessageException;
+import org.openhab.binding.zwave.internal.protocol.ZWaveByteMessageException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -102,11 +102,11 @@ public class ZWaveAssociationGroupInfoCommandClass extends ZWaveCommandClass
     /**
      * {@inheritDoc}
      *
-     * @throws ZWaveSerialMessageException
+     * @throws ZWaveByteMessageException
      */
     @Override
-    public void handleApplicationCommandRequest(SerialMessage serialMessage, int offset, int endpointId)
-            throws ZWaveSerialMessageException {
+    public void handleApplicationCommandRequest(ByteMessage serialMessage, int offset, int endpointId)
+            throws ZWaveByteMessageException {
         logger.debug("NODE {}: Received ASSOCIATION_GROUP_INFO command V{}", getNode().getNodeId(), getVersion());
         int command = serialMessage.getMessagePayloadByte(offset);
         switch (command) {
@@ -129,7 +129,7 @@ public class ZWaveAssociationGroupInfoCommandClass extends ZWaveCommandClass
         }
     }
 
-    private void processGroupNameReport(SerialMessage serialMessage, int offset) throws ZWaveSerialMessageException {
+    private void processGroupNameReport(ByteMessage serialMessage, int offset) throws ZWaveByteMessageException {
         int groupIdx = serialMessage.getMessagePayloadByte(offset + 1);
         int numBytes = serialMessage.getMessagePayloadByte(offset + 2);
 
@@ -181,7 +181,7 @@ public class ZWaveAssociationGroupInfoCommandClass extends ZWaveCommandClass
         getNode().getAssociationGroup(groupIdx).setName(groupName);
     }
 
-    private void processInfoReport(SerialMessage serialMessage, int offset) throws ZWaveSerialMessageException {
+    private void processInfoReport(ByteMessage serialMessage, int offset) throws ZWaveByteMessageException {
         boolean listMode = (serialMessage.getMessagePayloadByte(offset + 1) & REPORT_LISTMODE_MASK) != 0;
         boolean dynamicInfo = (serialMessage.getMessagePayloadByte(offset + 1) & REPORT_DYNAMICINFO_MASK) != 0;
 
@@ -214,7 +214,7 @@ public class ZWaveAssociationGroupInfoCommandClass extends ZWaveCommandClass
         }
     }
 
-    private void processCommandListReport(SerialMessage serialMessage, int offset) throws ZWaveSerialMessageException {
+    private void processCommandListReport(ByteMessage serialMessage, int offset) throws ZWaveByteMessageException {
         // List the CommandClasses and commands that will be send to the associated nodes in this group.
         // For now just log it, later this could be used auto associate to the group
         // ie always associate when we find a battery command class
@@ -248,11 +248,11 @@ public class ZWaveAssociationGroupInfoCommandClass extends ZWaveCommandClass
      *
      * @return the serial message
      */
-    public SerialMessage getGroupNameMessage(int groupidx) {
+    public ByteMessage getGroupNameMessage(int groupidx) {
         logger.debug("NODE {}: Creating new message for application command GROUP_NAME_GET for group {}",
                 getNode().getNodeId(), groupidx);
-        SerialMessage result = new SerialMessage(getNode().getNodeId(), SerialMessageClass.SendData,
-                SerialMessageType.Request, SerialMessageClass.ApplicationCommandHandler, SerialMessagePriority.Get);
+        ByteMessage result = new ByteMessage(getNode().getNodeId(), MessageClass.SendData,
+                ByteMessageType.Request, MessageClass.ApplicationCommandHandler, ByteMessagePriority.Get);
 
         ByteArrayOutputStream outputData = new ByteArrayOutputStream();
         outputData.write(getNode().getNodeId());
@@ -270,11 +270,11 @@ public class ZWaveAssociationGroupInfoCommandClass extends ZWaveCommandClass
      *
      * @return the serial message
      */
-    public SerialMessage getInfoMessage(int groupidx) {
+    public ByteMessage getInfoMessage(int groupidx) {
         logger.debug("NODE {}: Creating new message for application command INFO_GET for group {}",
                 getNode().getNodeId(), groupidx);
-        SerialMessage result = new SerialMessage(getNode().getNodeId(), SerialMessageClass.SendData,
-                SerialMessageType.Request, SerialMessageClass.ApplicationCommandHandler, SerialMessagePriority.Get);
+        ByteMessage result = new ByteMessage(getNode().getNodeId(), MessageClass.SendData,
+                ByteMessageType.Request, MessageClass.ApplicationCommandHandler, ByteMessagePriority.Get);
 
         byte listMode = 0;
         if (groupidx == 0) {
@@ -300,11 +300,11 @@ public class ZWaveAssociationGroupInfoCommandClass extends ZWaveCommandClass
      *
      * @return the serial message
      */
-    public SerialMessage getCommandListMessage(int groupidx) {
+    public ByteMessage getCommandListMessage(int groupidx) {
         logger.debug("NODE {}: Creating new message for application command COMMAND_LIST_GET for group {}",
                 getNode().getNodeId(), groupidx);
-        SerialMessage result = new SerialMessage(getNode().getNodeId(), SerialMessageClass.SendData,
-                SerialMessageType.Request, SerialMessageClass.ApplicationCommandHandler, SerialMessagePriority.Get);
+        ByteMessage result = new ByteMessage(getNode().getNodeId(), MessageClass.SendData,
+                ByteMessageType.Request, MessageClass.ApplicationCommandHandler, ByteMessagePriority.Get);
 
         byte allowCache = 0;
 
@@ -331,8 +331,8 @@ public class ZWaveAssociationGroupInfoCommandClass extends ZWaveCommandClass
     }
 
     @Override
-    public Collection<SerialMessage> initialize(boolean refresh) {
-        ArrayList<SerialMessage> result = new ArrayList<SerialMessage>();
+    public Collection<ByteMessage> initialize(boolean refresh) {
+        ArrayList<ByteMessage> result = new ArrayList<ByteMessage>();
 
         // Only initialise the root endpoint
         if (getEndpoint() != null) {

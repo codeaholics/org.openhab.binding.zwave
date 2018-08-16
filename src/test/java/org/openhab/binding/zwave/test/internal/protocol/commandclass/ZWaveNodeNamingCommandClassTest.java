@@ -14,7 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Test;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveCommandClass.CommandClass;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveNodeNamingCommandClass;
 import org.openhab.binding.zwave.internal.protocol.event.ZWaveCommandClassValueEvent;
@@ -98,7 +98,7 @@ public class ZWaveNodeNamingCommandClassTest extends ZWaveCommandClassTest {
     public void setName() {
         ZWaveNodeNamingCommandClass cls = (ZWaveNodeNamingCommandClass) getCommandClass(CommandClass.NODE_NAMING);
 
-        SerialMessage msg;
+        ByteMessage msg;
 
         byte[] expectedResponse1 = { 99, 10, 119, 1, 0, 84, 101, 115, 116, 105, 110, 103 };
         msg = cls.setNameMessage("Testing");
@@ -120,7 +120,7 @@ public class ZWaveNodeNamingCommandClassTest extends ZWaveCommandClassTest {
         // We so just do a quick test here to make sure the command format is correct
         ZWaveNodeNamingCommandClass cls = (ZWaveNodeNamingCommandClass) getCommandClass(CommandClass.NODE_NAMING);
 
-        SerialMessage msg;
+        ByteMessage msg;
 
         byte[] expectedResponse1 = { 99, 10, 119, 4, 0, 84, 101, 115, 116, 105, 110, 103 };
         msg = cls.setLocationMessage("Testing");

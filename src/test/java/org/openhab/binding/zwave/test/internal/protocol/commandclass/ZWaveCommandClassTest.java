@@ -14,9 +14,9 @@ import java.util.List;
 
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage.SerialMessageClass;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage.SerialMessageType;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage.MessageClass;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage.ByteMessageType;
 import org.openhab.binding.zwave.internal.protocol.ZWaveController;
 import org.openhab.binding.zwave.internal.protocol.ZWaveDeviceClass;
 import org.openhab.binding.zwave.internal.protocol.ZWaveDeviceClass.Basic;
@@ -24,7 +24,7 @@ import org.openhab.binding.zwave.internal.protocol.ZWaveDeviceClass.Generic;
 import org.openhab.binding.zwave.internal.protocol.ZWaveDeviceClass.Specific;
 import org.openhab.binding.zwave.internal.protocol.ZWaveEndpoint;
 import org.openhab.binding.zwave.internal.protocol.ZWaveNode;
-import org.openhab.binding.zwave.internal.protocol.ZWaveSerialMessageException;
+import org.openhab.binding.zwave.internal.protocol.ZWaveByteMessageException;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveCommandClass;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveCommandClass.CommandClass;
 import org.openhab.binding.zwave.internal.protocol.event.ZWaveEvent;
@@ -54,12 +54,12 @@ public class ZWaveCommandClassTest {
      * @return List of ZWaveEvent(s)
      */
     protected List<ZWaveEvent> processCommandClassMessage(byte[] packetData, int version) {
-        SerialMessage msg = new SerialMessage(packetData);
+        ByteMessage msg = new ByteMessage(packetData);
 
         // Check the packet is not corrupted and is a command class request
         assertEquals(true, msg.isValid);
-        assertEquals(SerialMessageType.Request, msg.getMessageType());
-        assertEquals(SerialMessageClass.ApplicationCommandHandler, msg.getMessageClass());
+        assertEquals(ByteMessageType.Request, msg.getMessageType());
+        assertEquals(MessageClass.ApplicationCommandHandler, msg.getMessageClass());
 
         // Mock the controller so we can get any events
         ZWaveController controller = Mockito.mock(ZWaveController.class);
@@ -75,7 +75,7 @@ public class ZWaveCommandClassTest {
             assertNotNull(cls);
             cls.setVersion(version);
             cls.handleApplicationCommandRequest(msg, 4, 0);
-        } catch (ZWaveSerialMessageException e) {
+        } catch (ZWaveByteMessageException e) {
             fail("Out of bounds exception processing data");
         }
 

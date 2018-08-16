@@ -13,8 +13,8 @@ import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 
 import org.junit.Test;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
-import org.openhab.binding.zwave.internal.protocol.serialmessage.GetVersionMessageClass;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
+import org.openhab.binding.zwave.internal.protocol.messages.GetVersionMessageClass;
 
 /**
  * Test cases for EnableSUCMessageClass message.
@@ -28,7 +28,7 @@ public class GetVersionMessageClassTest {
     public void doRequest() {
         byte[] expectedResponse = { 1, 3, 0, 21, -23 };
 
-        SerialMessage msg;
+        ByteMessage msg;
         GetVersionMessageClass handler = new GetVersionMessageClass();
 
         msg = handler.doRequest();

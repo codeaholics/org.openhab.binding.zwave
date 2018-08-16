@@ -46,7 +46,7 @@ import org.openhab.binding.zwave.ZWaveBindingConstants;
 import org.openhab.binding.zwave.handler.ZWaveThingChannel.DataType;
 import org.openhab.binding.zwave.internal.ZWaveConfigProvider;
 import org.openhab.binding.zwave.internal.ZWaveProduct;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
 import org.openhab.binding.zwave.internal.protocol.ZWaveAssociation;
 import org.openhab.binding.zwave.internal.protocol.ZWaveAssociationGroup;
 import org.openhab.binding.zwave.internal.protocol.ZWaveConfigurationParameter;
@@ -366,14 +366,14 @@ public class ZWaveThingHandler extends ConfigStatusThingHandler implements ZWave
                         return;
                     }
 
-                    List<SerialMessage> messages = new ArrayList<SerialMessage>();
+                    List<ByteMessage> messages = new ArrayList<ByteMessage>();
                     for (ZWaveThingChannel channel : thingChannelsPoll) {
                         logger.debug("NODE {}: Polling {}", nodeId, channel.getUID());
                         if (channel.converter == null) {
                             logger.debug("NODE {}: Polling aborted as no converter found for {}", nodeId,
                                     channel.getUID());
                         } else {
-                            List<SerialMessage> poll = channel.converter.executeRefresh(channel, node);
+                            List<ByteMessage> poll = channel.converter.executeRefresh(channel, node);
                             if (poll != null) {
                                 messages.addAll(poll);
                             }
@@ -392,7 +392,7 @@ public class ZWaveThingHandler extends ConfigStatusThingHandler implements ZWave
                     }
 
                     // Send all the messages
-                    for (SerialMessage message : messages) {
+                    for (ByteMessage message : messages) {
                         controllerHandler.sendData(message);
                     }
                 } catch (Exception e) {
@@ -612,7 +612,7 @@ public class ZWaveThingHandler extends ConfigStatusThingHandler implements ZWave
                 ArrayList<String> paramValues = new ArrayList<String>();
                 Object parameter = configurationParameter.getValue();
                 if (parameter instanceof List) {
-                    paramValues.addAll((List) configurationParameter.getValue());
+                    paramValues.addAll((List) parameter);
                 } else if (parameter instanceof String) {
                     paramValues.add((String) parameter);
                 }
@@ -874,7 +874,7 @@ public class ZWaveThingHandler extends ConfigStatusThingHandler implements ZWave
             return;
         }
 
-        List<SerialMessage> messages = null;
+        List<ByteMessage> messages = null;
         messages = cmdChannel.converter.receiveCommand(cmdChannel, node, command);
 
         if (messages == null) {
@@ -883,7 +883,7 @@ public class ZWaveThingHandler extends ConfigStatusThingHandler implements ZWave
         }
 
         // Send all the messages
-        for (SerialMessage message : messages) {
+        for (ByteMessage message : messages) {
             controllerHandler.sendData(message);
         }
     }
@@ -1511,7 +1511,7 @@ public class ZWaveThingHandler extends ConfigStatusThingHandler implements ZWave
      * Return an ISO 8601 combined date and time string for specified date/time
      *
      * @param date
-     *            Date
+     *                 Date
      * @return String with format "yyyy-MM-dd'T'HH:mm:ss'Z'"
      */
     private static String getISO8601StringForDate(Date date) {

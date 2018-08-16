@@ -16,7 +16,7 @@ import org.eclipse.smarthome.core.types.Command;
 import org.eclipse.smarthome.core.types.State;
 import org.openhab.binding.zwave.handler.ZWaveControllerHandler;
 import org.openhab.binding.zwave.handler.ZWaveThingChannel;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
 import org.openhab.binding.zwave.internal.protocol.ZWaveNode;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveCommandClass;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveThermostatFanModeCommandClass;
@@ -48,7 +48,7 @@ public class ZWaveThermostatFanModeConverter extends ZWaveCommandClassConverter 
      * {@inheritDoc}
      */
     @Override
-    public List<SerialMessage> executeRefresh(ZWaveThingChannel channel, ZWaveNode node) {
+    public List<ByteMessage> executeRefresh(ZWaveThingChannel channel, ZWaveNode node) {
         ZWaveThermostatFanModeCommandClass commandClass = (ZWaveThermostatFanModeCommandClass) node
                 .resolveCommandClass(ZWaveCommandClass.CommandClass.THERMOSTAT_FAN_MODE, channel.getEndpoint());
         if (commandClass == null) {
@@ -57,9 +57,9 @@ public class ZWaveThermostatFanModeConverter extends ZWaveCommandClassConverter 
 
         logger.debug("NODE {}: Generating poll message for {}, endpoint {}", node.getNodeId(),
                 commandClass.getCommandClass().getLabel(), channel.getEndpoint());
-        SerialMessage serialMessage = node.encapsulate(commandClass.getValueMessage(), commandClass,
+        ByteMessage serialMessage = node.encapsulate(commandClass.getValueMessage(), commandClass,
                 channel.getEndpoint());
-        List<SerialMessage> response = new ArrayList<SerialMessage>(1);
+        List<ByteMessage> response = new ArrayList<ByteMessage>(1);
         response.add(serialMessage);
         return response;
     }
@@ -76,14 +76,14 @@ public class ZWaveThermostatFanModeConverter extends ZWaveCommandClassConverter 
      * {@inheritDoc}
      */
     @Override
-    public List<SerialMessage> receiveCommand(ZWaveThingChannel channel, ZWaveNode node, Command command) {
+    public List<ByteMessage> receiveCommand(ZWaveThingChannel channel, ZWaveNode node, Command command) {
 
         ZWaveThermostatFanModeCommandClass commandClass = (ZWaveThermostatFanModeCommandClass) node
                 .resolveCommandClass(ZWaveCommandClass.CommandClass.THERMOSTAT_FAN_MODE, channel.getEndpoint());
 
         int value = ((DecimalType) command).intValue();
 
-        SerialMessage serialMessage = node.encapsulate(commandClass.setValueMessage(value), commandClass,
+        ByteMessage serialMessage = node.encapsulate(commandClass.setValueMessage(value), commandClass,
                 channel.getEndpoint());
         logger.debug("NODE {}: receiveCommand sending message {} ", node.getNodeId(), serialMessage);
         if (serialMessage == null) {
@@ -92,7 +92,7 @@ public class ZWaveThermostatFanModeConverter extends ZWaveCommandClassConverter 
             return null;
         }
 
-        List<SerialMessage> messages = new ArrayList<SerialMessage>();
+        List<ByteMessage> messages = new ArrayList<ByteMessage>();
         messages.add(serialMessage);
         return messages;
     }

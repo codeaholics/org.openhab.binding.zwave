@@ -17,12 +17,12 @@ import java.util.List;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage.SerialMessageClass;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage.SerialMessageType;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage.MessageClass;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage.ByteMessageType;
 import org.openhab.binding.zwave.internal.protocol.ZWaveController;
 import org.openhab.binding.zwave.internal.protocol.ZWaveNode;
-import org.openhab.binding.zwave.internal.protocol.ZWaveSerialMessageException;
+import org.openhab.binding.zwave.internal.protocol.ZWaveByteMessageException;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveCommandClass;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveCommandClass.CommandClass;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveMeterTblMonitorCommandClass;
@@ -46,7 +46,7 @@ public class ZWaveMeterTblMonitorCommandClassTest {
                 0x00, 0x01, 0x01, 0x01, 0x1B, 0x19, 0x60, 0x00, 0x00, 0x02, 0x6C, 0x68, 0x00, 0x00, 0x00, 0x00, -107 };
 
         List<ZWaveEvent> events = processCommandClassMessages(
-                Arrays.asList(new SerialMessage(initData), new SerialMessage(packetData)));
+                Arrays.asList(new ByteMessage(initData), new ByteMessage(packetData)));
 
         assertEquals(events.size(), 1);
 
@@ -58,7 +58,7 @@ public class ZWaveMeterTblMonitorCommandClassTest {
         assertEquals(event.getValue(), new BigDecimal("0.620"));
     }
 
-    protected List<ZWaveEvent> processCommandClassMessages(List<SerialMessage> msgs) {
+    protected List<ZWaveEvent> processCommandClassMessages(List<ByteMessage> msgs) {
 
         // Mock the controller so we can get any events
         ZWaveController controller = Mockito.mock(ZWaveController.class);
@@ -67,12 +67,12 @@ public class ZWaveMeterTblMonitorCommandClassTest {
         ZWaveNode node = Mockito.mock(ZWaveNode.class);
         ZWaveCommandClass cls = null;
 
-        for (SerialMessage msg : msgs) {
+        for (ByteMessage msg : msgs) {
 
             // Check the packet is not corrupted and is a command class request
             assertEquals(true, msg.isValid);
-            assertEquals(SerialMessageType.Request, msg.getMessageType());
-            assertEquals(SerialMessageClass.ApplicationCommandHandler, msg.getMessageClass());
+            assertEquals(ByteMessageType.Request, msg.getMessageType());
+            assertEquals(MessageClass.ApplicationCommandHandler, msg.getMessageClass());
 
             // Get the command class and process the response
             try {
@@ -84,7 +84,7 @@ public class ZWaveMeterTblMonitorCommandClassTest {
                     assertEquals(cls.getCommandClass().getKey(), msg.getMessagePayloadByte(3));
                 }
                 cls.handleApplicationCommandRequest(msg, 4, 0);
-            } catch (ZWaveSerialMessageException e) {
+            } catch (ZWaveByteMessageException e) {
                 fail("Out of bounds exception processing data");
             }
         }

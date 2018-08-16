@@ -24,10 +24,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.TimeUnit;
 
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage.SerialMessageClass;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage.SerialMessagePriority;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage.SerialMessageType;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage.MessageClass;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage.ByteMessagePriority;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage.ByteMessageType;
 import org.openhab.binding.zwave.internal.protocol.ZWaveController;
 import org.openhab.binding.zwave.internal.protocol.ZWaveEventListener;
 import org.openhab.binding.zwave.internal.protocol.ZWaveNode;
@@ -102,7 +102,7 @@ public class ZWaveSecureNonceTracker {
      * the time from which we generate the nonce request message to the time we actually send it can
      * be a significant delay, especially during secure inclusion
      */
-    private SerialMessage requestNonceMessage = null; // TODO: DB what was the point of this?
+    private ByteMessage requestNonceMessage = null; // TODO: DB what was the point of this?
 
     private SecureRandom secureRandom = null;
 
@@ -134,14 +134,14 @@ public class ZWaveSecureNonceTracker {
         }
     }
 
-    public synchronized SerialMessage buildNonceGetIfNeeded() {
+    public synchronized ByteMessage buildNonceGetIfNeeded() {
         if (hasNonceBeenRequested()) {
             logger.debug("NODE {}: already waiting for nonce", node.getNodeId());
             return null;
         }
         logger.debug("NODE {}: requesting nonce", node.getNodeId());
-        SerialMessage message = new SerialMessage(node.getNodeId(), SerialMessageClass.SendData,
-                SerialMessageType.Request, SerialMessageClass.ApplicationCommandHandler,
+        ByteMessage message = new ByteMessage(node.getNodeId(), MessageClass.SendData,
+                ByteMessageType.Request, MessageClass.ApplicationCommandHandler,
                 ZWaveSecurityCommandClass.SECURITY_MESSAGE_PRIORITY);
         byte[] payload = { (byte) node.getNodeId(), 2,
                 (byte) ZWaveSecurityCommandClass.getSecurityCommandClass().getKey(),
@@ -167,13 +167,13 @@ public class ZWaveSecureNonceTracker {
      *
      * TODO: Move the generation of the message to the command class - just deal with the nonce in this class!
      */
-    public SerialMessage generateAndBuildNonceReport() {
+    public ByteMessage generateAndBuildNonceReport() {
         Nonce nonce = ourNonceTable.generateNewUniqueNonceForDevice();
 
         // SECURITY_NONCE_REPORT gets immediate priority
-        SerialMessage message = new SerialMessage(node.getNodeId(), SerialMessageClass.SendData,
-                SerialMessageType.Request, SerialMessageClass.ApplicationCommandHandler,
-                SerialMessagePriority.Immediate);
+        ByteMessage message = new ByteMessage(node.getNodeId(), MessageClass.SendData,
+                ByteMessageType.Request, MessageClass.ApplicationCommandHandler,
+                ByteMessagePriority.Immediate);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         baos.write((byte) node.getNodeId());
         baos.write((byte) 10);
@@ -198,7 +198,7 @@ public class ZWaveSecureNonceTracker {
      * Called by {@link ZWaveSecurityCommandClass} so the nonce tracker is aware that
      * a nonce request is being sent via SECURITY_MESSAGE_ENCAP_NONCE_GET and our timer should be started
      */
-    public synchronized void sendingEncapNonceGet(SerialMessage message) {
+    public synchronized void sendingEncapNonceGet(ByteMessage message) {
         // No requestNonceTimer != null check since this will be called multiple times for teh same
         requestNonceTimer = new NonceTimer(NonceTimerType.REQUESTED, node);
         requestNonceMessage = message;
@@ -413,7 +413,7 @@ public class ZWaveSecureNonceTracker {
             if (timer != null) {
                 buf.append(timer.type).append("   ");
             }
-            buf.append(SerialMessage.bb2hex(nonceBytes));
+            buf.append(ByteMessage.bb2hex(nonceBytes));
             if (timer != null) {
                 buf.append("; time left=").append(timer.getTimeLeft());
             }
@@ -489,7 +489,7 @@ public class ZWaveSecureNonceTracker {
             }
             Nonce nonce = new Nonce(nonceBytes, new NonceTimer(NonceTimerType.GENERATED, node));
             logger.debug("NODE {}: Generated new nonce for device: {}", node.getNodeId(),
-                    SerialMessage.bb2hex(nonce.getNonceBytes()));
+                    ByteMessage.bb2hex(nonce.getNonceBytes()));
             table.put(nonce.getNonceId(), nonce);
             return nonce;
         }

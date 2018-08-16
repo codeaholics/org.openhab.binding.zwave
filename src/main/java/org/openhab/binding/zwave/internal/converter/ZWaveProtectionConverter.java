@@ -16,7 +16,7 @@ import org.eclipse.smarthome.core.types.Command;
 import org.eclipse.smarthome.core.types.State;
 import org.openhab.binding.zwave.handler.ZWaveControllerHandler;
 import org.openhab.binding.zwave.handler.ZWaveThingChannel;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
 import org.openhab.binding.zwave.internal.protocol.ZWaveNode;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveCommandClass;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveProtectionCommandClass;
@@ -58,7 +58,7 @@ public class ZWaveProtectionConverter extends ZWaveCommandClassConverter {
     }
 
     @Override
-    public List<SerialMessage> receiveCommand(ZWaveThingChannel channel, ZWaveNode node, Command command) {
+    public List<ByteMessage> receiveCommand(ZWaveThingChannel channel, ZWaveNode node, Command command) {
         String type = channel.getArguments().get("type");
 
         ZWaveProtectionCommandClass commandClass = (ZWaveProtectionCommandClass) node
@@ -68,7 +68,7 @@ public class ZWaveProtectionConverter extends ZWaveCommandClassConverter {
             return null;
         }
 
-        SerialMessage serialMessage = null;
+        ByteMessage serialMessage = null;
 
         if (type != null) {
             if (Type.PROTECTION_LOCAL.name().equals(type)) {
@@ -101,7 +101,7 @@ public class ZWaveProtectionConverter extends ZWaveCommandClassConverter {
         }
 
         logger.debug("NODE {}: Sending Message: {}", node.getNodeId(), serialMessage);
-        List<SerialMessage> messages = new ArrayList<SerialMessage>();
+        List<ByteMessage> messages = new ArrayList<ByteMessage>();
         messages.add(serialMessage);
 
         // Request an update so that OH knows when the protection settings has changed.

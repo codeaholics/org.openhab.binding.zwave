@@ -16,7 +16,7 @@ import org.eclipse.smarthome.core.types.Command;
 import org.eclipse.smarthome.core.types.State;
 import org.openhab.binding.zwave.handler.ZWaveControllerHandler;
 import org.openhab.binding.zwave.handler.ZWaveThingChannel;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
 import org.openhab.binding.zwave.internal.protocol.ZWaveConfigurationParameter;
 import org.openhab.binding.zwave.internal.protocol.ZWaveNode;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveCommandClass;
@@ -47,7 +47,7 @@ public class ZWaveConfigurationConverter extends ZWaveCommandClassConverter {
      * {@inheritDoc}
      */
     @Override
-    public List<SerialMessage> executeRefresh(ZWaveThingChannel channel, ZWaveNode node) {
+    public List<ByteMessage> executeRefresh(ZWaveThingChannel channel, ZWaveNode node) {
         ZWaveConfigurationCommandClass commandClass = (ZWaveConfigurationCommandClass) node
                 .resolveCommandClass(ZWaveCommandClass.CommandClass.CONFIGURATION, channel.getEndpoint());
         if (commandClass == null) {
@@ -67,9 +67,9 @@ public class ZWaveConfigurationConverter extends ZWaveCommandClassConverter {
             return null;
         }
 
-        SerialMessage serialMessage = node.encapsulate(commandClass.getConfigMessage(parmValue), commandClass,
+        ByteMessage serialMessage = node.encapsulate(commandClass.getConfigMessage(parmValue), commandClass,
                 channel.getEndpoint());
-        List<SerialMessage> response = new ArrayList<SerialMessage>(1);
+        List<ByteMessage> response = new ArrayList<ByteMessage>(1);
         response.add(serialMessage);
         return response;
     }
@@ -107,7 +107,7 @@ public class ZWaveConfigurationConverter extends ZWaveCommandClassConverter {
      * {@inheritDoc}
      */
     @Override
-    public List<SerialMessage> receiveCommand(ZWaveThingChannel channel, ZWaveNode node, Command command) {
+    public List<ByteMessage> receiveCommand(ZWaveThingChannel channel, ZWaveNode node, Command command) {
 
         String parmNumber = channel.getArguments().get("parameter");
         if (parmNumber == null) {
@@ -168,14 +168,14 @@ public class ZWaveConfigurationConverter extends ZWaveCommandClassConverter {
         }
 
         // Set the parameter
-        SerialMessage serialMessage = commandClass.setConfigMessage(configParameter);
+        ByteMessage serialMessage = commandClass.setConfigMessage(configParameter);
         if (serialMessage == null) {
             logger.warn("NODE {}: Generating message failed for command class = {}", node.getNodeId(),
                     commandClass.getCommandClass().getLabel());
             return null;
         }
 
-        List<SerialMessage> messages = new ArrayList<SerialMessage>();
+        List<ByteMessage> messages = new ArrayList<ByteMessage>();
         messages.add(serialMessage);
 
         // And request a read-back

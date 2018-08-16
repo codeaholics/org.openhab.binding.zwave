@@ -25,22 +25,22 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage.SerialMessageClass;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage.SerialMessagePriority;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage.SerialMessageType;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage.MessageClass;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage.ByteMessagePriority;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage.ByteMessageType;
 import org.openhab.binding.zwave.internal.protocol.ZWaveController;
 import org.openhab.binding.zwave.internal.protocol.ZWaveEndpoint;
 import org.openhab.binding.zwave.internal.protocol.ZWaveNode;
-import org.openhab.binding.zwave.internal.protocol.ZWaveSerialMessageException;
+import org.openhab.binding.zwave.internal.protocol.ZWaveByteMessageException;
 import org.openhab.binding.zwave.internal.protocol.event.ZWaveInclusionEvent;
 import org.openhab.binding.zwave.internal.protocol.event.ZWaveInclusionEvent.Type;
 import org.openhab.binding.zwave.internal.protocol.initialization.ZWaveNodeSerializer;
+import org.openhab.binding.zwave.internal.protocol.messages.ApplicationCommandMessageClass;
 import org.openhab.binding.zwave.internal.protocol.security.SecurityEncapsulatedSerialMessage;
 import org.openhab.binding.zwave.internal.protocol.security.ZWaveSecureNonceTracker;
 import org.openhab.binding.zwave.internal.protocol.security.ZWaveSecureNonceTracker.Nonce;
 import org.openhab.binding.zwave.internal.protocol.security.ZWaveSecurityPayloadFrame;
-import org.openhab.binding.zwave.internal.protocol.serialmessage.ApplicationCommandMessageClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -191,7 +191,7 @@ public abstract class ZWaveSecurityCommandClass extends ZWaveCommandClass {
     /**
      * Security messages are time sensitive so mark them as high priority
      */
-    public static final SerialMessagePriority SECURITY_MESSAGE_PRIORITY = SerialMessagePriority.High;
+    public static final ByteMessagePriority SECURITY_MESSAGE_PRIORITY = ByteMessagePriority.High;
 
     /**
      * Header is made up of 10 bytes:
@@ -314,7 +314,7 @@ public abstract class ZWaveSecurityCommandClass extends ZWaveCommandClass {
 
     abstract boolean checkRealNetworkKeyLoaded();
 
-    protected void transmitMessage(SerialMessage serialMessage) {
+    protected void transmitMessage(ByteMessage serialMessage) {
         // Normal (non-inclusion mode) so give the message to the controller to be transmitted
         getController().sendData(serialMessage);
     }
@@ -370,11 +370,11 @@ public abstract class ZWaveSecurityCommandClass extends ZWaveCommandClass {
     /**
      * {@inheritDoc}
      *
-     * @throws ZWaveSerialMessageException
+     * @throws ZWaveByteMessageException
      */
     @Override
-    public void handleApplicationCommandRequest(SerialMessage serialMessage, int offset, int endpoint)
-            throws ZWaveSerialMessageException {
+    public void handleApplicationCommandRequest(ByteMessage serialMessage, int offset, int endpoint)
+            throws ZWaveByteMessageException {
         byte command = (byte) serialMessage.getMessagePayloadByte(offset);
         traceHex("payload bytes for incoming security message", serialMessage.getMessagePayload());
         lastReceivedMessageTimestamp = System.currentTimeMillis();
@@ -413,7 +413,7 @@ public abstract class ZWaveSecurityCommandClass extends ZWaveCommandClass {
         }
     }
 
-    protected void processSecurityCommandsSupportedReport(SerialMessage serialMessage, int offset) {
+    protected void processSecurityCommandsSupportedReport(ByteMessage serialMessage, int offset) {
         // This can be received during device inclusion or outside of it depending on
         // SEND_SECURITY_COMMANDS_SUPPORTED_GET_ON_STARTUP
         byte[] messagePayload = serialMessage.getMessagePayload();
@@ -425,11 +425,11 @@ public abstract class ZWaveSecurityCommandClass extends ZWaveCommandClass {
         getNode().setSecuredClasses(secureClassBytes);
         receivedSecurityCommandsSupportedReport = true;
 
-        logger.debug("NODE {}: Supported Security Classes {}", SerialMessage.bb2hex(secureClassBytes));
+        logger.debug("NODE {}: Supported Security Classes {}", ByteMessage.bb2hex(secureClassBytes));
     }
 
-    public void sendNonceReport() throws ZWaveSerialMessageException {
-        SerialMessage nonceReportMessage = nonceGeneration.generateAndBuildNonceReport();
+    public void sendNonceReport() throws ZWaveByteMessageException {
+        ByteMessage nonceReportMessage = nonceGeneration.generateAndBuildNonceReport();
         if (nonceReportMessage == null) {
             logger.debug("NODE {}: SECURITY_ERROR generateAndBuildNonceReport returned null");
         } else {
@@ -439,7 +439,7 @@ public abstract class ZWaveSecurityCommandClass extends ZWaveCommandClass {
 
     /**
      * Decrypts a security encapsulated message from the Z-Wave network. Ideally this would return
-     * a {@link SerialMessage} but we don't have enough data to do so. So we just return the
+     * a {@link ByteMessage} but we don't have enough data to do so. So we just return the
      * decrypted payload bytes
      *
      * @param offset the offset at which the command byte exists
@@ -524,7 +524,7 @@ public abstract class ZWaveSecurityCommandClass extends ZWaveCommandClass {
             }
 
             // So we know if we got something that's not supported
-            logger.debug("NODE {}: SECURITY_RECEIVED {}", getNode().getNodeId(), SerialMessage.bb2hex(plaintextBytes));
+            logger.debug("NODE {}: SECURITY_RECEIVED {}", getNode().getNodeId(), ByteMessage.bb2hex(plaintextBytes));
 
             if (lastEncapsulatedRequstMessage != null) {
                 lastEncapsulatedRequstMessage.securityReponseReceived(plaintextBytes);
@@ -547,9 +547,9 @@ public abstract class ZWaveSecurityCommandClass extends ZWaveCommandClass {
      *
      * @param message
      *            the unencrypted message to be transmitted
-     * @throws ZWaveSerialMessageException
+     * @throws ZWaveByteMessageException
      */
-    public void queueMessageForEncapsulationAndTransmission(SerialMessage serialMessage) {
+    public void queueMessageForEncapsulationAndTransmission(ByteMessage serialMessage) {
         checkInit();
         if (serialMessage.getMessageBuffer().length < 7) {
             logger.debug("NODE {}: SECURITY_ERROR Message too short for encapsulation, dropping message {}",
@@ -557,7 +557,7 @@ public abstract class ZWaveSecurityCommandClass extends ZWaveCommandClass {
             return;
         }
 
-        if (serialMessage.getMessageClass() != SerialMessageClass.SendData) {
+        if (serialMessage.getMessageClass() != MessageClass.SendData) {
             logger.debug("NODE {}: SECURITY_ERROR Invalid message class {} for SendData for message {}",
                     getNode().getNodeId(), serialMessage.getMessageClass().getLabel(),
                     serialMessage.getMessageClass().getKey(), serialMessage.toString());
@@ -591,8 +591,8 @@ public abstract class ZWaveSecurityCommandClass extends ZWaveCommandClass {
                     shouldRemove = Arrays.equals(newMessageTwoBytes, aFrameFromQueueTwoBytes);
                     logger.debug("NODE {}: payloadEncapsulationQueue similar frame check, shouldRemove={}: {} vs {}",
                             getNode().getNodeId(), shouldRemove,
-                            SerialMessage.bb2hex(aFrameFromQueue.getMessageBytes()),
-                            SerialMessage.bb2hex(securityPayloadFrameList.get(0).getMessageBytes()));
+                            ByteMessage.bb2hex(aFrameFromQueue.getMessageBytes()),
+                            ByteMessage.bb2hex(securityPayloadFrameList.get(0).getMessageBytes()));
                 }
                 if (shouldRemove) {
                     removeFromEncapsulationQueue(aFrameFromQueue, iter, "Newer request received");
@@ -641,7 +641,7 @@ public abstract class ZWaveSecurityCommandClass extends ZWaveCommandClass {
      * Invoked by {@link ZWaveSecurityEncapsulationThread}. This method must only be called by
      * {@link ZWaveSecurityEncapsulationThread}
      *
-     * @throws ZWaveSerialMessageException
+     * @throws ZWaveByteMessageException
      */
     protected void sendNextMessageUsingDeviceNonce() {
         checkInit();
@@ -660,7 +660,7 @@ public abstract class ZWaveSecurityCommandClass extends ZWaveCommandClass {
 
         Nonce deviceNonce = nonceGeneration.getUseableDeviceNonce();
         if (deviceNonce == null) {
-            SerialMessage nonceGetMessage = nonceGeneration.buildNonceGetIfNeeded();
+            ByteMessage nonceGetMessage = nonceGeneration.buildNonceGetIfNeeded();
             if (nonceGetMessage == null) {
                 // Nothing to do, we are already waiting for a nonce from the device
             } else {
@@ -680,8 +680,8 @@ public abstract class ZWaveSecurityCommandClass extends ZWaveCommandClass {
         debugHex("SecurityPayloadBytes", securityPayload.getMessageBytes());
 
         // Note that we set the expected reply to that of the original message, as it can vary
-        SecurityEncapsulatedSerialMessage message = new SecurityEncapsulatedSerialMessage(SerialMessageClass.SendData,
-                SerialMessageType.Request, securityPayload.getOriginalMessage());
+        SecurityEncapsulatedSerialMessage message = new SecurityEncapsulatedSerialMessage(MessageClass.SendData,
+                ByteMessageType.Request, securityPayload.getOriginalMessage());
         message.setDeviceNonceId(deviceNonce.getNonceBytes()[0]);
 
         ByteArrayOutputStream outputData = new ByteArrayOutputStream();
@@ -977,7 +977,7 @@ public abstract class ZWaveSecurityCommandClass extends ZWaveCommandClass {
 
     /**
      * Utility method to dump a byte array as hex. Will only print the data if debug
-     * mode is debug logging is actually enabled. We don't use {@link SerialMessage#bb2hex(byte[])}
+     * mode is debug logging is actually enabled. We don't use {@link ByteMessage#bb2hex(byte[])}
      * because we need our debug format to match that of OZW
      *
      * @param description
@@ -996,7 +996,7 @@ public abstract class ZWaveSecurityCommandClass extends ZWaveCommandClass {
             bytes = new byte[length];
             System.arraycopy(bytesParam, offset, bytes, 0, length);
         }
-        logger.trace("NODE {}: {}={}", getNode().getNodeId(), description, SerialMessage.bb2hex(bytes));
+        logger.trace("NODE {}: {}={}", getNode().getNodeId(), description, ByteMessage.bb2hex(bytes));
     }
 
     private void traceHex(String description, byte[] bytes, int offset) {
@@ -1055,7 +1055,7 @@ public abstract class ZWaveSecurityCommandClass extends ZWaveCommandClass {
         return result;
     }
 
-    public static boolean isSecurityNonceReportMessage(SerialMessage serialMessage) {
+    public static boolean isSecurityNonceReportMessage(ByteMessage serialMessage) {
         if (serialMessage == null) {
             return false;
         }
@@ -1067,7 +1067,7 @@ public abstract class ZWaveSecurityCommandClass extends ZWaveCommandClass {
                 && payloadBytes[3] == SECURITY_NONCE_REPORT);
         if (result) {
             logger.trace("NODE {}: found Security NonceReportMessage={} payloadBytes={}",
-                    serialMessage.getMessageNode(), result, SerialMessage.bb2hex(payloadBytes));
+                    serialMessage.getMessageNode(), result, ByteMessage.bb2hex(payloadBytes));
         }
         return result;
     }
@@ -1106,18 +1106,18 @@ public abstract class ZWaveSecurityCommandClass extends ZWaveCommandClass {
                         // on the controller and the device. The user (or other logic in the code) could fire off
                         // many duplicates (such as BATTERY_GET on startup) which just holds up other operations.
                         Iterator<ZWaveSecurityPayloadFrame> iter = payloadEncapsulationQueue.iterator();
-                        SerialMessage successfulMessage = lastEncapsulatedRequstMessage.getSecurityPayload()
+                        ByteMessage successfulMessage = lastEncapsulatedRequstMessage.getSecurityPayload()
                                 .getOriginalMessage();
                         while (iter.hasNext()) {
                             ZWaveSecurityPayloadFrame securityPayloadToBeSent = iter.next();
-                            SerialMessage messageToBeSent = securityPayloadToBeSent.getOriginalMessage();
+                            ByteMessage messageToBeSent = securityPayloadToBeSent.getOriginalMessage();
                             boolean shouldRemove = Arrays.equals(messageToBeSent.getMessagePayload(),
                                     successfulMessage.getMessagePayload());
                             logger.debug(
                                     "NODE {}: success look ahead check: shouldRemove={} messageToBeSent={} successfulMessage={}",
                                     getNode().getNodeId(), shouldRemove,
-                                    SerialMessage.bb2hex(messageToBeSent.getMessagePayload()),
-                                    SerialMessage.bb2hex(successfulMessage.getMessagePayload()));
+                                    ByteMessage.bb2hex(messageToBeSent.getMessagePayload()),
+                                    ByteMessage.bb2hex(successfulMessage.getMessagePayload()));
                             if (shouldRemove) {
                                 removeFromEncapsulationQueue(securityPayloadToBeSent, iter,
                                         "look ahead found identical message");

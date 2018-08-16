@@ -25,7 +25,7 @@ import org.mockito.Mockito;
 import org.openhab.binding.zwave.handler.ZWaveThingChannel;
 import org.openhab.binding.zwave.handler.ZWaveThingChannel.DataType;
 import org.openhab.binding.zwave.internal.converter.ZWaveMeterConverter;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
 import org.openhab.binding.zwave.internal.protocol.ZWaveController;
 import org.openhab.binding.zwave.internal.protocol.ZWaveEndpoint;
 import org.openhab.binding.zwave.internal.protocol.ZWaveNode;
@@ -85,7 +85,7 @@ public class ZWaveMeterConverterTest extends ZWaveCommandClassConverterTest {
         ZWaveNode node = CreateMockedNode(2, options);
 
         // Refresh won't return anything for meter channel
-        List<SerialMessage> msgs = converter.executeRefresh(channel, node);
+        List<ByteMessage> msgs = converter.executeRefresh(channel, node);
         assertNull(msgs);
 
         ZWaveCommandClassValueEvent event = createEvent(ZWaveMeterCommandClass.MeterType.ELECTRIC,
@@ -100,7 +100,7 @@ public class ZWaveMeterConverterTest extends ZWaveCommandClassConverterTest {
         assertEquals(1, msgs.size());
 
         byte[] expectedResponse = { 1, 9, 0, 19, 0, 2, 50, 5, 0, 0, -48 };
-        SerialMessage msg = msgs.get(0);
+        ByteMessage msg = msgs.get(0);
         msg.setCallbackId(0);
         assertTrue(Arrays.equals(msg.getMessageBuffer(), expectedResponse));
     }

@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.TimeZone;
 
 import org.junit.Test;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveClockCommandClass;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveCommandClass.CommandClass;
 import org.openhab.binding.zwave.internal.protocol.event.ZWaveCommandClassValueEvent;
@@ -63,7 +63,7 @@ public class ZWaveClockCommandClassTest extends ZWaveCommandClassTest {
         Calendar utc = Calendar.getInstance();
         utc.setTimeZone(TimeZone.getTimeZone("UTC"));
         utc.setTime(new Date(0));
-        SerialMessage msg = cls.getSetMessage(utc);
+        ByteMessage msg = cls.getSetMessage(utc);
 
         assertArrayEquals(expectedResponse, msg.getMessagePayload());
     }
@@ -77,7 +77,7 @@ public class ZWaveClockCommandClassTest extends ZWaveCommandClassTest {
         Calendar utc = Calendar.getInstance();
         utc.setTimeZone(TimeZone.getTimeZone("UTC"));
         utc.setTime(new Date(0));
-        SerialMessage msg = cls.getReportMessage(utc);
+        ByteMessage msg = cls.getReportMessage(utc);
 
         assertArrayEquals(expectedResponse, msg.getMessagePayload());
     }

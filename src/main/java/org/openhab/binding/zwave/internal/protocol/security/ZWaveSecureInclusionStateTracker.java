@@ -11,9 +11,9 @@ package org.openhab.binding.zwave.internal.protocol.security;
 import java.util.Arrays;
 import java.util.List;
 
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
 import org.openhab.binding.zwave.internal.protocol.ZWaveNode;
-import org.openhab.binding.zwave.internal.protocol.ZWaveSerialMessageException;
+import org.openhab.binding.zwave.internal.protocol.ZWaveByteMessageException;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveSecurityCommandClass;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveSecurityCommandClassWithInitialization;
 import org.openhab.binding.zwave.internal.protocol.initialization.ZWaveNodeInitStageAdvancer;
@@ -56,10 +56,10 @@ public class ZWaveSecureInclusionStateTracker {
     private static final int WAIT_TIME_MILLIS = 10000;
 
     /**
-     * The next {@link SerialMessage} that will be given to {@link ZWaveNodeInitStageAdvancer}
+     * The next {@link ByteMessage} that will be given to {@link ZWaveNodeInitStageAdvancer}
      * when it calls {@link ZWaveSecurityCommandClass#initialize(boolean)}
      */
-    private SerialMessage nextRequestMessage = null;
+    private ByteMessage nextRequestMessage = null;
 
     /**
      * Lock object that will be used for synchronization
@@ -128,7 +128,7 @@ public class ZWaveSecureInclusionStateTracker {
         waitForReplyTimeout = System.currentTimeMillis() + WAIT_TIME_MILLIS;
     }
 
-    public void setNextRequest(SerialMessage message) {
+    public void setNextRequest(ByteMessage message) {
         logger.debug("NODE {}: in InclusionStateTracker.setNextRequest() (current={}) with {}", node.getNodeId(),
                 (nextRequestMessage != null), message);
         if (nextRequestMessage != null) {
@@ -138,7 +138,7 @@ public class ZWaveSecureInclusionStateTracker {
         }
         try {
             verifyAndAdvanceState((byte) (message.getMessagePayloadByte(3) & 0xff));
-        } catch (ZWaveSerialMessageException e) {
+        } catch (ZWaveByteMessageException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
@@ -154,7 +154,7 @@ public class ZWaveSecureInclusionStateTracker {
      *
      * @return the next message or null if there was none
      */
-    public SerialMessage getNextRequest() {
+    public ByteMessage getNextRequest() {
         synchronized (nextMessageLock) {
             logger.debug("NODE {}: in InclusionStateTracker.getNextRequest() time left for reply: {}ms, returning {}",
                     node.getNodeId(), (System.currentTimeMillis() - waitForReplyTimeout), nextRequestMessage);
@@ -164,7 +164,7 @@ public class ZWaveSecureInclusionStateTracker {
                 return null;
             }
             if (nextRequestMessage != null) {
-                SerialMessage message = nextRequestMessage;
+                ByteMessage message = nextRequestMessage;
                 resetWaitForReplyTimeout();
                 nextRequestMessage = null;
                 return message;

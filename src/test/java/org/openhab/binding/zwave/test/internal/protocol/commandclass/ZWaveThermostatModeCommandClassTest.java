@@ -13,7 +13,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 
 import org.junit.Test;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveBasicCommandClass;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveCommandClass.CommandClass;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveThermostatModeCommandClass;
@@ -29,7 +29,7 @@ public class ZWaveThermostatModeCommandClassTest extends ZWaveCommandClassTest {
     public void getValueMessage() {
         ZWaveThermostatModeCommandClass cls = (ZWaveThermostatModeCommandClass) getCommandClass(
                 CommandClass.THERMOSTAT_MODE);
-        SerialMessage msg;
+        ByteMessage msg;
 
         byte[] expectedResponseV1 = { 1, 9, 0, 19, 99, 2, 64, 2, 0, 0, -58 };
         cls.setVersion(1);
@@ -41,7 +41,7 @@ public class ZWaveThermostatModeCommandClassTest extends ZWaveCommandClassTest {
     public void setValueMessage() {
         ZWaveThermostatModeCommandClass cls = (ZWaveThermostatModeCommandClass) getCommandClass(
                 CommandClass.THERMOSTAT_MODE);
-        SerialMessage msg;
+        ByteMessage msg;
 
         byte[] expectedResponseV1 = { 1, 9, 0, 19, 99, 2, 64, 4, 0, 0, -64 };
         cls.setVersion(1);
@@ -54,7 +54,7 @@ public class ZWaveThermostatModeCommandClassTest extends ZWaveCommandClassTest {
     public void getSupportedMessage() {
         ZWaveThermostatModeCommandClass cls = (ZWaveThermostatModeCommandClass) getCommandClass(
                 CommandClass.THERMOSTAT_MODE);
-        SerialMessage msg;
+        ByteMessage msg;
 
         byte[] expectedResponseV1 = { 1, 9, 0, 19, 99, 2, 64, 4, 0, 0, -64 };
         cls.setVersion(1);

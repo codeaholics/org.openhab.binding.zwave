@@ -12,11 +12,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
 import org.openhab.binding.zwave.internal.protocol.ZWaveController;
 import org.openhab.binding.zwave.internal.protocol.ZWaveEndpoint;
 import org.openhab.binding.zwave.internal.protocol.ZWaveNode;
-import org.openhab.binding.zwave.internal.protocol.ZWaveSerialMessageException;
+import org.openhab.binding.zwave.internal.protocol.ZWaveByteMessageException;
 import org.openhab.binding.zwave.internal.protocol.event.ZWaveCommandClassValueEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -116,11 +116,11 @@ public class ZWaveSwitchAllCommandClass extends ZWaveCommandClass implements ZWa
     /**
      * {@inheritDoc}
      *
-     * @throws ZWaveSerialMessageException
+     * @throws ZWaveByteMessageException
      */
     @Override
-    public void handleApplicationCommandRequest(SerialMessage serialMessage, int offset, int endpoint)
-            throws ZWaveSerialMessageException {
+    public void handleApplicationCommandRequest(ByteMessage serialMessage, int offset, int endpoint)
+            throws ZWaveByteMessageException {
         logger.debug("NODE {}: Received SWITCH_ALL command V{}", getNode().getNodeId());
         int command = serialMessage.getMessagePayloadByte(offset);
         switch (command) {
@@ -138,8 +138,8 @@ public class ZWaveSwitchAllCommandClass extends ZWaveCommandClass implements ZWa
         }
     }
 
-    protected void processSwitchAllReport(SerialMessage serialMessage, int offset, int endpoint)
-            throws ZWaveSerialMessageException {
+    protected void processSwitchAllReport(ByteMessage serialMessage, int offset, int endpoint)
+            throws ZWaveByteMessageException {
         int m = serialMessage.getMessagePayloadByte(offset + 1);
         mode = SwitchAllMode.fromInteger(m);
 
@@ -155,16 +155,16 @@ public class ZWaveSwitchAllCommandClass extends ZWaveCommandClass implements ZWa
         getController().notifyEventListeners(zEvent);
     }
 
-    public SerialMessage getValueMessage() {
+    public ByteMessage getValueMessage() {
         if (!isGetSupported) {
             logger.debug("NODE {}: Node doesn't support get requests", getNode().getNodeId());
             return null;
         }
 
         logger.debug("NODE {}: Creating new message for command SWITCH_ALL_GET", getNode().getNodeId());
-        SerialMessage result = new SerialMessage(getNode().getNodeId(), SerialMessage.SerialMessageClass.SendData,
-                SerialMessage.SerialMessageType.Request, SerialMessage.SerialMessageClass.ApplicationCommandHandler,
-                SerialMessage.SerialMessagePriority.Get);
+        ByteMessage result = new ByteMessage(getNode().getNodeId(), ByteMessage.MessageClass.SendData,
+                ByteMessage.ByteMessageType.Request, ByteMessage.MessageClass.ApplicationCommandHandler,
+                ByteMessage.ByteMessagePriority.Get);
         byte[] newPayload = { (byte) getNode().getNodeId(), 2, (byte) getCommandClass().getKey(),
                 (byte) SWITCH_ALL_GET };
         result.setMessagePayload(newPayload);
@@ -179,7 +179,7 @@ public class ZWaveSwitchAllCommandClass extends ZWaveCommandClass implements ZWa
      *            Both All on and All off)
      * @return SerialMessage
      */
-    public SerialMessage setValueMessage(int newMode) {
+    public ByteMessage setValueMessage(int newMode) {
         mode = SwitchAllMode.fromInteger(newMode);
 
         if (mode != null) {
@@ -189,9 +189,9 @@ public class ZWaveSwitchAllCommandClass extends ZWaveCommandClass implements ZWa
             return null;
         }
 
-        SerialMessage result = new SerialMessage(getNode().getNodeId(), SerialMessage.SerialMessageClass.SendData,
-                SerialMessage.SerialMessageType.Request, SerialMessage.SerialMessageClass.SendData,
-                SerialMessage.SerialMessagePriority.Set);
+        ByteMessage result = new ByteMessage(getNode().getNodeId(), ByteMessage.MessageClass.SendData,
+                ByteMessage.ByteMessageType.Request, ByteMessage.MessageClass.SendData,
+                ByteMessage.ByteMessagePriority.Set);
         byte[] newPayload = { (byte) getNode().getNodeId(), 3, (byte) getCommandClass().getKey(), (byte) SWITCH_ALL_SET,
                 (byte) newMode };
 
@@ -204,11 +204,11 @@ public class ZWaveSwitchAllCommandClass extends ZWaveCommandClass implements ZWa
      *
      * @return
      */
-    public SerialMessage allOnMessage() {
+    public ByteMessage allOnMessage() {
         logger.debug("NODE {}: Switch All - Creating All On message.", getNode().getNodeId());
-        SerialMessage result = new SerialMessage(getNode().getNodeId(), SerialMessage.SerialMessageClass.SendData,
-                SerialMessage.SerialMessageType.Request, SerialMessage.SerialMessageClass.SendData,
-                SerialMessage.SerialMessagePriority.Set);
+        ByteMessage result = new ByteMessage(getNode().getNodeId(), ByteMessage.MessageClass.SendData,
+                ByteMessage.ByteMessageType.Request, ByteMessage.MessageClass.SendData,
+                ByteMessage.ByteMessagePriority.Set);
         byte[] newPayload = { (byte) getNode().getNodeId(), 2, (byte) getCommandClass().getKey(),
                 (byte) SWITCH_ALL_ON };
         result.setMessagePayload(newPayload);
@@ -220,11 +220,11 @@ public class ZWaveSwitchAllCommandClass extends ZWaveCommandClass implements ZWa
      *
      * @return
      */
-    public SerialMessage allOffMessage() {
+    public ByteMessage allOffMessage() {
         logger.debug("NODE {}: Switch All - Creating All Off message.", getNode().getNodeId());
-        SerialMessage result = new SerialMessage(getNode().getNodeId(), SerialMessage.SerialMessageClass.SendData,
-                SerialMessage.SerialMessageType.Request, SerialMessage.SerialMessageClass.SendData,
-                SerialMessage.SerialMessagePriority.Set);
+        ByteMessage result = new ByteMessage(getNode().getNodeId(), ByteMessage.MessageClass.SendData,
+                ByteMessage.ByteMessageType.Request, ByteMessage.MessageClass.SendData,
+                ByteMessage.ByteMessagePriority.Set);
         byte[] newPayload = { (byte) getNode().getNodeId(), 2, (byte) getCommandClass().getKey(),
                 (byte) SWITCH_ALL_OFF };
         result.setMessagePayload(newPayload);
@@ -250,8 +250,8 @@ public class ZWaveSwitchAllCommandClass extends ZWaveCommandClass implements ZWa
     }
 
     @Override
-    public Collection<SerialMessage> initialize(boolean refresh) {
-        ArrayList<SerialMessage> result = new ArrayList<SerialMessage>();
+    public Collection<ByteMessage> initialize(boolean refresh) {
+        ArrayList<ByteMessage> result = new ArrayList<ByteMessage>();
         // If we're already initialized, then don't do it again unless we're
         // refreshing
         if (refresh == true || initialiseDone == false) {

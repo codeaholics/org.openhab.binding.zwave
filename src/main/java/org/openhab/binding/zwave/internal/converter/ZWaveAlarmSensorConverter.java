@@ -15,7 +15,7 @@ import org.eclipse.smarthome.core.library.types.OnOffType;
 import org.eclipse.smarthome.core.types.State;
 import org.openhab.binding.zwave.handler.ZWaveControllerHandler;
 import org.openhab.binding.zwave.handler.ZWaveThingChannel;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
 import org.openhab.binding.zwave.internal.protocol.ZWaveNode;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveAlarmSensorCommandClass;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveAlarmSensorCommandClass.AlarmType;
@@ -48,7 +48,7 @@ public class ZWaveAlarmSensorConverter extends ZWaveCommandClassConverter {
      * {@inheritDoc}
      */
     @Override
-    public List<SerialMessage> executeRefresh(ZWaveThingChannel channel, ZWaveNode node) {
+    public List<ByteMessage> executeRefresh(ZWaveThingChannel channel, ZWaveNode node) {
         ZWaveAlarmSensorCommandClass commandClass = (ZWaveAlarmSensorCommandClass) node
                 .resolveCommandClass(ZWaveCommandClass.CommandClass.SENSOR_ALARM, channel.getEndpoint());
         if (commandClass == null) {
@@ -59,7 +59,7 @@ public class ZWaveAlarmSensorConverter extends ZWaveCommandClassConverter {
         logger.debug("NODE {}: Generating poll message for {}, endpoint {}, alarm {}", node.getNodeId(),
                 commandClass.getCommandClass().getLabel(), channel.getEndpoint(), alarmType);
 
-        SerialMessage serialMessage;
+        ByteMessage serialMessage;
         if (alarmType != null) {
             serialMessage = node.encapsulate(commandClass.getMessage(AlarmType.valueOf(alarmType)), commandClass,
                     channel.getEndpoint());
@@ -71,7 +71,7 @@ public class ZWaveAlarmSensorConverter extends ZWaveCommandClassConverter {
             return null;
         }
 
-        List<SerialMessage> response = new ArrayList<SerialMessage>();
+        List<ByteMessage> response = new ArrayList<ByteMessage>();
         response.add(serialMessage);
         return response;
     }

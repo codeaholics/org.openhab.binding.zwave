@@ -13,8 +13,8 @@ import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 
 import org.junit.Test;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
-import org.openhab.binding.zwave.internal.protocol.serialmessage.MemoryGetIdMessageClass;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
+import org.openhab.binding.zwave.internal.protocol.messages.MemoryGetIdMessageClass;
 
 /**
  * Test cases for EnableSUCMessageClass message.
@@ -28,7 +28,7 @@ public class MemoryGetIdMessageClassTest {
     public void doRequest() {
         byte[] expectedResponse = { 1, 3, 0, 32, -36 };
 
-        SerialMessage msg;
+        ByteMessage msg;
         MemoryGetIdMessageClass handler = new MemoryGetIdMessageClass();
 
         msg = handler.doRequest();

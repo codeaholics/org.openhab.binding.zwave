@@ -13,8 +13,8 @@ import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 
 import org.junit.Test;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
-import org.openhab.binding.zwave.internal.protocol.serialmessage.ControllerSetDefaultMessageClass;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
+import org.openhab.binding.zwave.internal.protocol.messages.ControllerSetDefaultMessageClass;
 
 /**
  * Test cases for ControllerSetDefaultMessageClass message.
@@ -28,7 +28,7 @@ public class ControllerSetDefaultMessageClassTest {
     public void doRequest() {
         byte[] expectedResponse = { 1, 3, 0, 66, -66 };
 
-        SerialMessage msg;
+        ByteMessage msg;
         ControllerSetDefaultMessageClass handler = new ControllerSetDefaultMessageClass();
 
         msg = handler.doRequest();

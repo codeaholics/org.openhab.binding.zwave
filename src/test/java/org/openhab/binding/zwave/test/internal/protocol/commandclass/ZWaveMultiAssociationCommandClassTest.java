@@ -14,7 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Test;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveCommandClass.CommandClass;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveMultiAssociationCommandClass;
 import org.openhab.binding.zwave.internal.protocol.event.ZWaveAssociationEvent;
@@ -31,7 +31,7 @@ public class ZWaveMultiAssociationCommandClassTest extends ZWaveCommandClassTest
     public void getAssociationMessage() {
         ZWaveMultiAssociationCommandClass cls = (ZWaveMultiAssociationCommandClass) getCommandClass(
                 CommandClass.MULTI_INSTANCE_ASSOCIATION);
-        SerialMessage msg;
+        ByteMessage msg;
 
         byte[] expectedResponseV1 = { 1, 10, 0, 19, 99, 3, -114, 2, 1, 0, 4, 15 };
         cls.setVersion(1);
@@ -44,7 +44,7 @@ public class ZWaveMultiAssociationCommandClassTest extends ZWaveCommandClassTest
     public void getGroupingsMessage() {
         ZWaveMultiAssociationCommandClass cls = (ZWaveMultiAssociationCommandClass) getCommandClass(
                 CommandClass.MULTI_INSTANCE_ASSOCIATION);
-        SerialMessage msg;
+        ByteMessage msg;
 
         byte[] expectedResponseV1 = { 1, 9, 0, 19, 99, 2, -114, 5, 0, 4, 11 };
         cls.setVersion(1);
@@ -57,7 +57,7 @@ public class ZWaveMultiAssociationCommandClassTest extends ZWaveCommandClassTest
     public void removeAssociationMessage() {
         ZWaveMultiAssociationCommandClass cls = (ZWaveMultiAssociationCommandClass) getCommandClass(
                 CommandClass.MULTI_INSTANCE_ASSOCIATION);
-        SerialMessage msg;
+        ByteMessage msg;
 
         byte[] expectedResponse1 = { 1, 13, 0, 19, 99, 6, -114, 4, 1, 0, 2, 0, 0, 4, 9 };
         byte[] expectedResponse2 = { 1, 13, 0, 19, 99, 6, -114, 4, 1, 0, 2, 3, 0, 4, 10 };
@@ -76,7 +76,7 @@ public class ZWaveMultiAssociationCommandClassTest extends ZWaveCommandClassTest
     public void clearAssociationMessage() {
         ZWaveMultiAssociationCommandClass cls = (ZWaveMultiAssociationCommandClass) getCommandClass(
                 CommandClass.MULTI_INSTANCE_ASSOCIATION);
-        SerialMessage msg;
+        ByteMessage msg;
 
         byte[] expectedResponseV1 = { 1, 10, 0, 19, 99, 3, -114, 4, 1, 0, 0, 13 };
         cls.setVersion(1);
@@ -88,7 +88,7 @@ public class ZWaveMultiAssociationCommandClassTest extends ZWaveCommandClassTest
     public void setAssociationMessageV2() {
         ZWaveMultiAssociationCommandClass cls = (ZWaveMultiAssociationCommandClass) getCommandClass(
                 CommandClass.MULTI_INSTANCE_ASSOCIATION);
-        SerialMessage msg;
+        ByteMessage msg;
 
         // Version 2 doesn't allow endpoint 0 to be set
         byte[] expectedResponse2 = { 1, 11, 0, 19, 99, 4, -114, 1, 1, 2, 0, 4, 8 };
@@ -103,7 +103,7 @@ public class ZWaveMultiAssociationCommandClassTest extends ZWaveCommandClassTest
     public void setAssociationMessageV3() {
         ZWaveMultiAssociationCommandClass cls = (ZWaveMultiAssociationCommandClass) getCommandClass(
                 CommandClass.MULTI_INSTANCE_ASSOCIATION);
-        SerialMessage msg;
+        ByteMessage msg;
 
         byte[] expectedResponse1 = { 1, 13, 0, 19, 99, 6, -114, 1, 1, 0, 2, 0, 0, 4, 12 };
         byte[] expectedResponse2 = { 1, 13, 0, 19, 99, 6, -114, 1, 1, 0, 2, 3, 0, 4, 15 };

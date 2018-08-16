@@ -14,7 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Test;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveColorCommandClass;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveColorCommandClass.ZWaveColorType;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveColorCommandClass.ZWaveColorValueEvent;
@@ -31,7 +31,7 @@ public class ZWaveColorCommandClassTest extends ZWaveCommandClassTest {
     @Test
     public void getCapabilityMessage() {
         ZWaveColorCommandClass cls = (ZWaveColorCommandClass) getCommandClass(CommandClass.COLOR);
-        SerialMessage msg;
+        ByteMessage msg;
 
         byte[] expectedResponseV1 = { 1, 9, 0, 19, 99, 2, 51, 1, 0, 0, -74 };
         cls.setVersion(1);
@@ -42,7 +42,7 @@ public class ZWaveColorCommandClassTest extends ZWaveCommandClassTest {
     @Test
     public void getValueMessage() {
         ZWaveColorCommandClass cls = (ZWaveColorCommandClass) getCommandClass(CommandClass.COLOR);
-        SerialMessage msg;
+        ByteMessage msg;
 
         byte[] expectedResponseV1 = { 1, 10, 0, 19, 99, 3, 51, 3, 1, 0, 0, -73 };
         cls.setVersion(1);
@@ -53,7 +53,7 @@ public class ZWaveColorCommandClassTest extends ZWaveCommandClassTest {
     @Test
     public void setValueMessage() {
         ZWaveColorCommandClass cls = (ZWaveColorCommandClass) getCommandClass(CommandClass.COLOR);
-        SerialMessage msg;
+        ByteMessage msg;
 
         byte[] expectedResponseV1 = { 1, 11, 0, 19, 99, 4, 51, 5, 3, 80, 0, 0, -27 };
         cls.setVersion(1);

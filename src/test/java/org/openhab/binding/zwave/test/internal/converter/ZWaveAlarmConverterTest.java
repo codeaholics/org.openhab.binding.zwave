@@ -25,7 +25,7 @@ import org.mockito.Mockito;
 import org.openhab.binding.zwave.handler.ZWaveThingChannel;
 import org.openhab.binding.zwave.handler.ZWaveThingChannel.DataType;
 import org.openhab.binding.zwave.internal.converter.ZWaveAlarmConverter;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
 import org.openhab.binding.zwave.internal.protocol.ZWaveController;
 import org.openhab.binding.zwave.internal.protocol.ZWaveEndpoint;
 import org.openhab.binding.zwave.internal.protocol.ZWaveNode;
@@ -145,7 +145,7 @@ public class ZWaveAlarmConverterTest extends ZWaveCommandClassConverterTest {
 
     @Test
     public void sendNotification() {
-        List<SerialMessage> msgs;
+        List<ByteMessage> msgs;
         DecimalType command;
         Map<String, String> args = new HashMap<String, String>();
         args.put("event1", AlarmType.SMOKE.toString() + ":1");

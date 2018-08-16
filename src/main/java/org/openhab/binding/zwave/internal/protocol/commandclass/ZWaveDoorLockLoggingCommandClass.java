@@ -14,14 +14,14 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage.SerialMessageClass;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage.SerialMessagePriority;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage.SerialMessageType;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage.MessageClass;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage.ByteMessagePriority;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage.ByteMessageType;
 import org.openhab.binding.zwave.internal.protocol.ZWaveController;
 import org.openhab.binding.zwave.internal.protocol.ZWaveEndpoint;
 import org.openhab.binding.zwave.internal.protocol.ZWaveNode;
-import org.openhab.binding.zwave.internal.protocol.ZWaveSerialMessageException;
+import org.openhab.binding.zwave.internal.protocol.ZWaveByteMessageException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,11 +68,11 @@ public class ZWaveDoorLockLoggingCommandClass extends ZWaveCommandClass implemen
     /**
      * {@inheritDoc}
      *
-     * @throws ZWaveSerialMessageException
+     * @throws ZWaveByteMessageException
      */
     @Override
-    public void handleApplicationCommandRequest(SerialMessage serialMessage, int offset, int endpoint)
-            throws ZWaveSerialMessageException {
+    public void handleApplicationCommandRequest(ByteMessage serialMessage, int offset, int endpoint)
+            throws ZWaveByteMessageException {
         logger.debug("NODE {}: Received door lock logging command (v{})", this.getNode().getNodeId(),
                 this.getVersion());
         int command = serialMessage.getMessagePayloadByte(offset);
@@ -109,11 +109,11 @@ public class ZWaveDoorLockLoggingCommandClass extends ZWaveCommandClass implemen
         }
     }
 
-    public SerialMessage getSupported() {
+    public ByteMessage getSupported() {
         logger.debug("NODE {}: Creating new message for application command LOGGING_SUPPORTED_GET",
                 this.getNode().getNodeId());
-        SerialMessage message = new SerialMessage(this.getNode().getNodeId(), SerialMessageClass.SendData,
-                SerialMessageType.Request, SerialMessageClass.ApplicationCommandHandler, SerialMessagePriority.Get);
+        ByteMessage message = new ByteMessage(this.getNode().getNodeId(), MessageClass.SendData,
+                ByteMessageType.Request, MessageClass.ApplicationCommandHandler, ByteMessagePriority.Get);
         ByteArrayOutputStream outputData = new ByteArrayOutputStream();
         outputData.write((byte) this.getNode().getNodeId());
         outputData.write(2);
@@ -123,11 +123,11 @@ public class ZWaveDoorLockLoggingCommandClass extends ZWaveCommandClass implemen
         return message;
     }
 
-    public SerialMessage getEntry(int id) {
+    public ByteMessage getEntry(int id) {
         logger.debug("NODE {}: Creating new message for application command LOGGING_RECORD_GET",
                 this.getNode().getNodeId());
-        SerialMessage message = new SerialMessage(this.getNode().getNodeId(), SerialMessageClass.SendData,
-                SerialMessageType.Request, SerialMessageClass.ApplicationCommandHandler, SerialMessagePriority.Get);
+        ByteMessage message = new ByteMessage(this.getNode().getNodeId(), MessageClass.SendData,
+                ByteMessageType.Request, MessageClass.ApplicationCommandHandler, ByteMessagePriority.Get);
         ByteArrayOutputStream outputData = new ByteArrayOutputStream();
         outputData.write((byte) this.getNode().getNodeId());
         outputData.write(3);
@@ -139,11 +139,11 @@ public class ZWaveDoorLockLoggingCommandClass extends ZWaveCommandClass implemen
     }
 
     @Override
-    public Collection<SerialMessage> initialize(boolean refresh) {
+    public Collection<ByteMessage> initialize(boolean refresh) {
         if (refresh == false && supportedMessages != -1) {
             return null;
         }
-        Collection<SerialMessage> result = new ArrayList<SerialMessage>();
+        Collection<ByteMessage> result = new ArrayList<ByteMessage>();
         result.add(getSupported());
         return result;
     }

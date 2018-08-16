@@ -13,7 +13,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 
 import org.junit.Test;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveAlarmSensorCommandClass;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveAlarmSensorCommandClass.AlarmType;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveCommandClass.CommandClass;
@@ -28,7 +28,7 @@ public class ZWaveAlarmSensorCommandClassTest extends ZWaveCommandClassTest {
     @Test
     public void getSupportedMessage() {
         ZWaveAlarmSensorCommandClass cls = (ZWaveAlarmSensorCommandClass) getCommandClass(CommandClass.SENSOR_ALARM);
-        SerialMessage msg;
+        ByteMessage msg;
 
         byte[] expectedResponseV1 = { 1, 9, 0, 19, 99, 2, -100, 3, 0, 0, 27 };
         cls.setVersion(1);
@@ -39,7 +39,7 @@ public class ZWaveAlarmSensorCommandClassTest extends ZWaveCommandClassTest {
     @Test
     public void getMessage() {
         ZWaveAlarmSensorCommandClass cls = (ZWaveAlarmSensorCommandClass) getCommandClass(CommandClass.SENSOR_ALARM);
-        SerialMessage msg;
+        ByteMessage msg;
 
         byte[] expectedResponseV1 = { 1, 10, 0, 19, 99, 3, -100, 1, 6, 0, 0, 29 };
         cls.setVersion(1);

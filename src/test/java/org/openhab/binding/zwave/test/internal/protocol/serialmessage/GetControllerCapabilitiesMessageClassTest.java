@@ -13,8 +13,8 @@ import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 
 import org.junit.Test;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
-import org.openhab.binding.zwave.internal.protocol.serialmessage.GetControllerCapabilitiesMessageClass;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
+import org.openhab.binding.zwave.internal.protocol.messages.GetControllerCapabilitiesMessageClass;
 
 /**
  * Test cases for IdentifyNode message.
@@ -28,7 +28,7 @@ public class GetControllerCapabilitiesMessageClassTest {
     public void doRequest() {
         byte[] expectedResponse = { 1, 3, 0, 5, -7 };
 
-        SerialMessage msg;
+        ByteMessage msg;
         GetControllerCapabilitiesMessageClass handler = new GetControllerCapabilitiesMessageClass();
 
         msg = handler.doRequest();

@@ -13,8 +13,8 @@ import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 
 import org.junit.Test;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
-import org.openhab.binding.zwave.internal.protocol.serialmessage.GetSucNodeIdMessageClass;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
+import org.openhab.binding.zwave.internal.protocol.messages.GetSucNodeIdMessageClass;
 
 /**
  * Test cases for EnableSUCMessageClass message.
@@ -28,7 +28,7 @@ public class GetSucNodeIdMessageClassTest {
     public void doRequest() {
         byte[] expectedResponse = { 1, 3, 0, 86, -86 };
 
-        SerialMessage msg;
+        ByteMessage msg;
         GetSucNodeIdMessageClass handler = new GetSucNodeIdMessageClass();
 
         msg = handler.doRequest();

@@ -19,7 +19,7 @@ import org.eclipse.smarthome.core.types.Command;
 import org.eclipse.smarthome.core.types.State;
 import org.openhab.binding.zwave.handler.ZWaveControllerHandler;
 import org.openhab.binding.zwave.handler.ZWaveThingChannel;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
 import org.openhab.binding.zwave.internal.protocol.ZWaveNode;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveColorCommandClass;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveColorCommandClass.ZWaveColorType;
@@ -51,7 +51,7 @@ public class ZWaveColorConverter extends ZWaveCommandClassConverter {
      * {@inheritDoc}
      */
     @Override
-    public List<SerialMessage> executeRefresh(ZWaveThingChannel channel, ZWaveNode node) {
+    public List<ByteMessage> executeRefresh(ZWaveThingChannel channel, ZWaveNode node) {
         ZWaveColorCommandClass commandClass = (ZWaveColorCommandClass) node
                 .resolveCommandClass(ZWaveCommandClass.CommandClass.COLOR, channel.getEndpoint());
         if (commandClass == null) {
@@ -62,9 +62,9 @@ public class ZWaveColorConverter extends ZWaveCommandClassConverter {
                 commandClass.getCommandClass().getLabel(), channel.getEndpoint());
 
         // Add a poll to update the color
-        List<SerialMessage> messages = new ArrayList<SerialMessage>();
-        Collection<SerialMessage> rawMessages = commandClass.getColor();
-        for (SerialMessage msg : rawMessages) {
+        List<ByteMessage> messages = new ArrayList<ByteMessage>();
+        Collection<ByteMessage> rawMessages = commandClass.getColor();
+        for (ByteMessage msg : rawMessages) {
             messages.add(node.encapsulate(msg, commandClass, channel.getEndpoint()));
         }
         return messages;
@@ -113,11 +113,11 @@ public class ZWaveColorConverter extends ZWaveCommandClassConverter {
      * {@inheritDoc}
      */
     @Override
-    public List<SerialMessage> receiveCommand(ZWaveThingChannel channel, ZWaveNode node, Command command) {
+    public List<ByteMessage> receiveCommand(ZWaveThingChannel channel, ZWaveNode node, Command command) {
         ZWaveColorCommandClass commandClass = (ZWaveColorCommandClass) node
                 .resolveCommandClass(ZWaveCommandClass.CommandClass.COLOR, channel.getEndpoint());
 
-        Collection<SerialMessage> rawMessages = null;
+        Collection<ByteMessage> rawMessages = null;
 
         // Since we get an HSB, there is brightness information. However, we only deal with the color class here
         // so we need to scale the color and let the brightness be handled by the multi_level command class
@@ -163,14 +163,14 @@ public class ZWaveColorConverter extends ZWaveCommandClassConverter {
             return null;
         }
 
-        List<SerialMessage> messages = new ArrayList<SerialMessage>();
-        for (SerialMessage msg : rawMessages) {
+        List<ByteMessage> messages = new ArrayList<ByteMessage>();
+        for (ByteMessage msg : rawMessages) {
             messages.add(node.encapsulate(msg, commandClass, channel.getEndpoint()));
         }
 
         // Add a poll to update the color
         rawMessages = commandClass.getColor();
-        for (SerialMessage msg : rawMessages) {
+        for (ByteMessage msg : rawMessages) {
             messages.add(node.encapsulate(msg, commandClass, channel.getEndpoint()));
         }
         return messages;

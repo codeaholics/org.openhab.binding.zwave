@@ -13,8 +13,8 @@ import static org.junit.Assert.*;
 import java.util.Arrays;
 
 import org.junit.Test;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
-import org.openhab.binding.zwave.internal.protocol.serialmessage.SerialApiGetInitDataMessageClass;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
+import org.openhab.binding.zwave.internal.protocol.messages.SerialApiGetInitDataMessageClass;
 
 /**
  * Test cases for SerialApiGetInitDataMessageClass message.
@@ -28,7 +28,7 @@ public class SerialApiGetInitDataMessageClassTest extends ZWaveCommandProcessorT
     public void doRequest() {
         byte[] expectedResponse = { 1, 3, 0, 2, -2 };
 
-        SerialMessage msg;
+        ByteMessage msg;
         SerialApiGetInitDataMessageClass handler = new SerialApiGetInitDataMessageClass();
 
         msg = handler.doRequest();

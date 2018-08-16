@@ -35,7 +35,7 @@ import org.mockito.Mockito;
 import org.openhab.binding.zwave.ZWaveBindingConstants;
 import org.openhab.binding.zwave.handler.ZWaveControllerHandler;
 import org.openhab.binding.zwave.handler.ZWaveThingHandler;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
 import org.openhab.binding.zwave.internal.protocol.ZWaveAssociationGroup;
 import org.openhab.binding.zwave.internal.protocol.ZWaveController;
 import org.openhab.binding.zwave.internal.protocol.ZWaveNode;
@@ -51,7 +51,7 @@ import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveWakeUpComma
  */
 public class ZWaveThingHandlerTest {
 
-    private List<SerialMessage> doConfigurationUpdate(String param, Object value) {
+    private List<ByteMessage> doConfigurationUpdate(String param, Object value) {
         ThingType thingType = ThingTypeBuilder.instance("bindingId", "thingTypeId", "label").build();
         Thing thing = ThingFactory.createThing(thingType, new ThingUID(thingType.getUID(), "thingId"),
                 new Configuration());
@@ -62,8 +62,8 @@ public class ZWaveThingHandlerTest {
         ThingHandlerCallback thingCallback = Mockito.mock(ThingHandlerCallback.class);
         ZWaveThingHandler thingHandler = new ZWaveThingHandler(thing);
         thingHandler.setCallback(thingCallback);
-        ArgumentCaptor<SerialMessage> argument;
-        argument = ArgumentCaptor.forClass(SerialMessage.class);
+        ArgumentCaptor<ByteMessage> argument;
+        argument = ArgumentCaptor.forClass(ByteMessage.class);
         Field fieldControllerHandler;
         try {
             ZWaveWakeUpCommandClass wakeupClass = new ZWaveWakeUpCommandClass(node, controller, null);
@@ -110,7 +110,7 @@ public class ZWaveThingHandlerTest {
     @Ignore
     @Test
     public void TestConfigurationWakeup() {
-        List<SerialMessage> response = doConfigurationUpdate(ZWaveBindingConstants.CONFIGURATION_WAKEUPINTERVAL,
+        List<ByteMessage> response = doConfigurationUpdate(ZWaveBindingConstants.CONFIGURATION_WAKEUPINTERVAL,
                 new BigDecimal(600));
 
         assertEquals(2, response.size());
@@ -125,7 +125,7 @@ public class ZWaveThingHandlerTest {
     public void TestConfigurationAssociation() {
         List<String> nodeList = new ArrayList<String>();
         nodeList.add("node_1_0");
-        List<SerialMessage> response = doConfigurationUpdate("group_1", nodeList);
+        List<ByteMessage> response = doConfigurationUpdate("group_1", nodeList);
 
         // Check that there are only 2 requests - the SET and GET
         // Note that these are currently null due to mocking

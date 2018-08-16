@@ -24,7 +24,7 @@ import org.openhab.binding.zwave.handler.ZWaveControllerHandler;
 import org.openhab.binding.zwave.handler.ZWaveThingChannel;
 import org.openhab.binding.zwave.handler.ZWaveThingChannel.DataType;
 import org.openhab.binding.zwave.internal.converter.ZWaveMultiLevelSwitchConverter;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
 import org.openhab.binding.zwave.internal.protocol.ZWaveNode;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveCommandClass.CommandClass;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveMultiLevelSwitchCommandClass;
@@ -214,8 +214,8 @@ public class ZWaveMultiLevelSwitchConverterTest {
         when(channel.getDataType()).thenReturn(DataType.PercentType);
         when(channel.getEndpoint()).thenReturn(1);
         when(node.resolveCommandClass(CommandClass.SWITCH_MULTILEVEL, channel.getEndpoint())).thenReturn(commandClass);
-        when(node.encapsulate(any(SerialMessage.class), any(ZWaveMultiLevelSwitchCommandClass.class), anyInt()))
-                .thenReturn(new SerialMessage());
+        when(node.encapsulate(any(ByteMessage.class), any(ZWaveMultiLevelSwitchCommandClass.class), anyInt()))
+                .thenReturn(new ByteMessage());
     }
 
 }

@@ -13,8 +13,8 @@ import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 
 import org.junit.Test;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
-import org.openhab.binding.zwave.internal.protocol.serialmessage.AssignSucReturnRouteMessageClass;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
+import org.openhab.binding.zwave.internal.protocol.messages.AssignSucReturnRouteMessageClass;
 
 /**
  * Test cases for AssignSucReturnRouteMessageClass message.
@@ -29,7 +29,7 @@ public class AssignSucReturnRouteMessageClassTest {
         byte[] expectedResponse = { 1, 5, 0, 81, 12, 1, -90 };
 
         AssignSucReturnRouteMessageClass handler = new AssignSucReturnRouteMessageClass();
-        SerialMessage msg = handler.doRequest(12, 1);
+        ByteMessage msg = handler.doRequest(12, 1);
 
         assertTrue(Arrays.equals(msg.getMessageBuffer(), expectedResponse));
     }

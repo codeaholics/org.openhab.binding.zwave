@@ -15,7 +15,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Test;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveCommandClass.CommandClass;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveMultiLevelSensorCommandClass;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveMultiLevelSensorCommandClass.SensorType;
@@ -126,7 +126,7 @@ public class ZWaveMultiLevelSensorCommandClassTest extends ZWaveCommandClassTest
     public void getMessageDirectionV5() {
         ZWaveMultiLevelSensorCommandClass cls = (ZWaveMultiLevelSensorCommandClass) getCommandClass(
                 CommandClass.SENSOR_MULTILEVEL);
-        SerialMessage msg;
+        ByteMessage msg;
 
         byte[] expectedResponseV1 = { 1, 11, 0, 19, 99, 4, 49, 4, 7, 0, 0, 16, -94 };
         cls.setVersion(5);
@@ -139,7 +139,7 @@ public class ZWaveMultiLevelSensorCommandClassTest extends ZWaveCommandClassTest
     public void getMessageTemperatureV1() {
         ZWaveMultiLevelSensorCommandClass cls = (ZWaveMultiLevelSensorCommandClass) getCommandClass(
                 CommandClass.SENSOR_MULTILEVEL);
-        SerialMessage msg;
+        ByteMessage msg;
 
         byte[] expectedResponseV1 = { 1, 9, 0, 19, 99, 2, 49, 4, 0, 1, -80 };
         cls.setVersion(1);
@@ -152,7 +152,7 @@ public class ZWaveMultiLevelSensorCommandClassTest extends ZWaveCommandClassTest
     public void getMessageTemperatureV5() {
         ZWaveMultiLevelSensorCommandClass cls = (ZWaveMultiLevelSensorCommandClass) getCommandClass(
                 CommandClass.SENSOR_MULTILEVEL);
-        SerialMessage msg;
+        ByteMessage msg;
 
         byte[] expectedResponseV1 = { 1, 11, 0, 19, 99, 4, 49, 4, 1, 0, 0, 1, -75 };
         cls.setVersion(5);
@@ -165,7 +165,7 @@ public class ZWaveMultiLevelSensorCommandClassTest extends ZWaveCommandClassTest
     public void getSupportedSensorMessage() {
         ZWaveMultiLevelSensorCommandClass cls = (ZWaveMultiLevelSensorCommandClass) getCommandClass(
                 CommandClass.SENSOR_MULTILEVEL);
-        SerialMessage msg;
+        ByteMessage msg;
 
         cls.setVersion(1);
         msg = cls.getSupportedSensorMessage();
@@ -181,7 +181,7 @@ public class ZWaveMultiLevelSensorCommandClassTest extends ZWaveCommandClassTest
     public void getSupportedScaleMessage() {
         ZWaveMultiLevelSensorCommandClass cls = (ZWaveMultiLevelSensorCommandClass) getCommandClass(
                 CommandClass.SENSOR_MULTILEVEL);
-        SerialMessage msg;
+        ByteMessage msg;
 
         cls.setVersion(1);
         msg = cls.getSupportedScaleMessage(SensorType.TEMPERATURE);

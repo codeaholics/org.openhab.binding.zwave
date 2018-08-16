@@ -10,7 +10,7 @@ package org.openhab.binding.zwave.internal.protocol.commandclass;
 
 import java.util.Collection;
 
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
 
 /**
  * Interface that command classes can implement to implement retrieval of dynamic state information.
@@ -28,5 +28,5 @@ public interface ZWaveCommandClassDynamicState {
      * @param refresh if true will request all dynamic states even if they are already initialised
      * @return the messages with the queries for dynamic values.
      */
-    public Collection<SerialMessage> getDynamicValues(boolean refresh);
+    public Collection<ByteMessage> getDynamicValues(boolean refresh);
 }

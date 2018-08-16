@@ -13,7 +13,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 
 import org.junit.Test;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveCommandClass.CommandClass;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveNoOperationCommandClass;
 
@@ -28,7 +28,7 @@ public class ZWaveNoOperationCommandClassTest extends ZWaveCommandClassTest {
     public void getNoOperationMessage() {
         ZWaveNoOperationCommandClass cls = (ZWaveNoOperationCommandClass) getCommandClass(CommandClass.NO_OPERATION);
 
-        SerialMessage msg;
+        ByteMessage msg;
 
         byte[] expectedResponse1 = { 1, 8, 0, 19, 99, 1, 0, 0, 0, -122 };
         msg = cls.getNoOperationMessage();

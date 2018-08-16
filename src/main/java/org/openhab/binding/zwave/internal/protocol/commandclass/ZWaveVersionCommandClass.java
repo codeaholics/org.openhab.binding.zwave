@@ -11,14 +11,14 @@ package org.openhab.binding.zwave.internal.protocol.commandclass;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage.SerialMessageClass;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage.SerialMessagePriority;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage.SerialMessageType;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage.MessageClass;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage.ByteMessagePriority;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage.ByteMessageType;
 import org.openhab.binding.zwave.internal.protocol.ZWaveController;
 import org.openhab.binding.zwave.internal.protocol.ZWaveEndpoint;
 import org.openhab.binding.zwave.internal.protocol.ZWaveNode;
-import org.openhab.binding.zwave.internal.protocol.ZWaveSerialMessageException;
+import org.openhab.binding.zwave.internal.protocol.ZWaveByteMessageException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,11 +73,11 @@ public class ZWaveVersionCommandClass extends ZWaveCommandClass {
     /**
      * {@inheritDoc}
      *
-     * @throws ZWaveSerialMessageException
+     * @throws ZWaveByteMessageException
      */
     @Override
-    public void handleApplicationCommandRequest(SerialMessage serialMessage, int offset, int endpoint)
-            throws ZWaveSerialMessageException {
+    public void handleApplicationCommandRequest(ByteMessage serialMessage, int offset, int endpoint)
+            throws ZWaveByteMessageException {
         logger.debug("NODE {}: Received COMMAND_CLASS_VERSION command V{}", getNode().getNodeId(), getVersion());
         int command = serialMessage.getMessagePayloadByte(offset);
         switch (command) {
@@ -175,10 +175,10 @@ public class ZWaveVersionCommandClass extends ZWaveCommandClass {
      *
      * @return the serial message
      */
-    public SerialMessage getVersionMessage() {
+    public ByteMessage getVersionMessage() {
         logger.debug("NODE {}: Creating new message for command VERSION_GET", getNode().getNodeId());
-        SerialMessage result = new SerialMessage(this.getNode().getNodeId(), SerialMessageClass.SendData,
-                SerialMessageType.Request, SerialMessageClass.ApplicationCommandHandler, SerialMessagePriority.Config);
+        ByteMessage result = new ByteMessage(this.getNode().getNodeId(), MessageClass.SendData,
+                ByteMessageType.Request, MessageClass.ApplicationCommandHandler, ByteMessagePriority.Config);
         byte[] newPayload = { (byte) this.getNode().getNodeId(), 2, (byte) getCommandClass().getKey(),
                 (byte) VERSION_GET };
         result.setMessagePayload(newPayload);
@@ -193,11 +193,11 @@ public class ZWaveVersionCommandClass extends ZWaveCommandClass {
      * @param commandClass The command class to get the version for.
      * @return the serial message
      */
-    public SerialMessage getCommandClassVersionMessage(CommandClass commandClass) {
+    public ByteMessage getCommandClassVersionMessage(CommandClass commandClass) {
         logger.debug("NODE {}: Creating new message for application command VERSION_COMMAND_CLASS_GET command class {}",
                 getNode().getNodeId(), commandClass.getLabel());
-        SerialMessage result = new SerialMessage(this.getNode().getNodeId(), SerialMessageClass.SendData,
-                SerialMessageType.Request, SerialMessageClass.ApplicationCommandHandler, SerialMessagePriority.Config);
+        ByteMessage result = new ByteMessage(this.getNode().getNodeId(), MessageClass.SendData,
+                ByteMessageType.Request, MessageClass.ApplicationCommandHandler, ByteMessagePriority.Config);
         byte[] newPayload = { (byte) this.getNode().getNodeId(), 3, (byte) getCommandClass().getKey(),
                 (byte) VERSION_COMMAND_CLASS_GET, (byte) commandClass.getKey() };
         result.setMessagePayload(newPayload);
@@ -210,7 +210,7 @@ public class ZWaveVersionCommandClass extends ZWaveCommandClass {
      * @param commandClass the command class to check the version for.
      * @return serial message to be sent
      */
-    public SerialMessage checkVersion(ZWaveCommandClass commandClass) {
+    public ByteMessage checkVersion(ZWaveCommandClass commandClass) {
         ZWaveVersionCommandClass versionCommandClass = (ZWaveVersionCommandClass) this.getNode()
                 .getCommandClass(CommandClass.VERSION);
 

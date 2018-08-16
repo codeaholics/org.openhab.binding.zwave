@@ -13,7 +13,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 
 import org.junit.Test;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveBasicCommandClass;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveCommandClass.CommandClass;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWavePowerLevelCommandClass;
@@ -28,7 +28,7 @@ public class ZWavePowerLevelCommandClassTest extends ZWaveCommandClassTest {
     @Test
     public void getValueMessage() {
         ZWavePowerLevelCommandClass cls = (ZWavePowerLevelCommandClass) getCommandClass(CommandClass.POWERLEVEL);
-        SerialMessage msg;
+        ByteMessage msg;
 
         byte[] expectedResponseV1 = { 1, 9, 0, 19, 99, 2, 115, 2, 0, 0, -11 };
         cls.setVersion(1);
@@ -39,7 +39,7 @@ public class ZWavePowerLevelCommandClassTest extends ZWaveCommandClassTest {
     @Test
     public void setValueMessage() {
         ZWavePowerLevelCommandClass cls = (ZWavePowerLevelCommandClass) getCommandClass(CommandClass.POWERLEVEL);
-        SerialMessage msg;
+        ByteMessage msg;
 
         byte[] expectedResponseV1 = { 1, 11, 0, 19, 99, 4, 115, 1, 1, 1, 0, 0, -14 };
         cls.setVersion(1);

@@ -14,7 +14,7 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 
 import org.junit.Test;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveCommandClass.CommandClass;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveThermostatSetpointCommandClass;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveThermostatSetpointCommandClass.SetpointType;
@@ -30,7 +30,7 @@ public class ZWaveThermostatSetpointCommandClassTest extends ZWaveCommandClassTe
     public void getValueMessage() {
         ZWaveThermostatSetpointCommandClass cls = (ZWaveThermostatSetpointCommandClass) getCommandClass(
                 CommandClass.THERMOSTAT_SETPOINT);
-        SerialMessage msg;
+        ByteMessage msg;
 
         byte[] expectedResponseV1 = { 1, 9, 0, 19, 99, 2, 67, 4, 0, 0, -61 };
         cls.setVersion(1);
@@ -42,7 +42,7 @@ public class ZWaveThermostatSetpointCommandClassTest extends ZWaveCommandClassTe
     public void setMessage() {
         ZWaveThermostatSetpointCommandClass cls = (ZWaveThermostatSetpointCommandClass) getCommandClass(
                 CommandClass.THERMOSTAT_SETPOINT);
-        SerialMessage msg;
+        ByteMessage msg;
 
         byte[] expectedResponse = { 1, 13, 0, 19, 99, 6, 67, 1, 2, 34, 0, -31, 0, 0, 7 };
         cls.setVersion(1);
@@ -55,7 +55,7 @@ public class ZWaveThermostatSetpointCommandClassTest extends ZWaveCommandClassTe
     public void getSupportedMessage() {
         ZWaveThermostatSetpointCommandClass cls = (ZWaveThermostatSetpointCommandClass) getCommandClass(
                 CommandClass.THERMOSTAT_SETPOINT);
-        SerialMessage msg;
+        ByteMessage msg;
 
         byte[] expectedResponseV1 = { 1, 9, 0, 19, 99, 2, 67, 4, 0, 0, -61 };
         cls.setVersion(1);

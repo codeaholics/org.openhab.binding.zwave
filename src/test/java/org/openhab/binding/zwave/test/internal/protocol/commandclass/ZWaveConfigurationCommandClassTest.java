@@ -13,7 +13,7 @@ import static org.junit.Assert.*;
 import java.util.Arrays;
 
 import org.junit.Test;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
 import org.openhab.binding.zwave.internal.protocol.ZWaveConfigurationParameter;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveCommandClass.CommandClass;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveConfigurationCommandClass;
@@ -29,7 +29,7 @@ public class ZWaveConfigurationCommandClassTest extends ZWaveCommandClassTest {
     public void getValueMessage() {
         ZWaveConfigurationCommandClass cls = (ZWaveConfigurationCommandClass) getCommandClass(
                 CommandClass.CONFIGURATION);
-        SerialMessage msg;
+        ByteMessage msg;
 
         byte[] expectedResponseV1 = { 1, 10, 0, 19, 99, 3, 112, 5, 12, 0, 0, -1 };
         cls.setVersion(1);
@@ -71,7 +71,7 @@ public class ZWaveConfigurationCommandClassTest extends ZWaveCommandClassTest {
     public void setValueMessage() {
         ZWaveConfigurationCommandClass cls = (ZWaveConfigurationCommandClass) getCommandClass(
                 CommandClass.CONFIGURATION);
-        SerialMessage msg;
+        ByteMessage msg;
 
         ZWaveConfigurationParameter parameter = new ZWaveConfigurationParameter(12, 34, 4);
 

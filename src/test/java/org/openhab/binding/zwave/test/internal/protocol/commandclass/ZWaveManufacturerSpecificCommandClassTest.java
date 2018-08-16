@@ -13,8 +13,8 @@ import static org.junit.Assert.*;
 import java.util.Arrays;
 
 import org.junit.Test;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
-import org.openhab.binding.zwave.internal.protocol.ZWaveSerialMessageException;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
+import org.openhab.binding.zwave.internal.protocol.ZWaveByteMessageException;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveCommandClass.CommandClass;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveManufacturerSpecificCommandClass;
 
@@ -29,7 +29,7 @@ public class ZWaveManufacturerSpecificCommandClassTest extends ZWaveCommandClass
     public void getManufacturerSpecificMessage() {
         ZWaveManufacturerSpecificCommandClass cls = (ZWaveManufacturerSpecificCommandClass) getCommandClass(
                 CommandClass.MANUFACTURER_SPECIFIC);
-        SerialMessage msg;
+        ByteMessage msg;
 
         byte[] expectedResponseV1 = { 1, 9, 0, 19, 99, 2, 114, 4, 0, 0, -14 };
         cls.setVersion(1);
@@ -41,7 +41,7 @@ public class ZWaveManufacturerSpecificCommandClassTest extends ZWaveCommandClass
     public void getManufacturerSpecificDeviceMessage() {
         ZWaveManufacturerSpecificCommandClass cls = (ZWaveManufacturerSpecificCommandClass) getCommandClass(
                 CommandClass.MANUFACTURER_SPECIFIC);
-        SerialMessage msg;
+        ByteMessage msg;
 
         byte[] expectedResponseSerialNumber = { 1, 10, 0, 19, 99, 3, 114, 6, 1, 0, 0, -13 };
         cls.setVersion(1);
@@ -56,13 +56,13 @@ public class ZWaveManufacturerSpecificCommandClassTest extends ZWaveCommandClass
 
         ZWaveManufacturerSpecificCommandClass cls = (ZWaveManufacturerSpecificCommandClass) getCommandClass(
                 CommandClass.MANUFACTURER_SPECIFIC);
-        SerialMessage msg = new SerialMessage(packetData);
+        ByteMessage msg = new ByteMessage(packetData);
         try {
             cls.handleApplicationCommandRequest(msg, 4, 0);
             assertEquals(0x010f, cls.getDeviceManufacturer());
             assertEquals(0x0200, cls.getDeviceType());
             assertEquals(0x0104, cls.getDeviceId());
-        } catch (ZWaveSerialMessageException e) {
+        } catch (ZWaveByteMessageException e) {
         }
     }
 

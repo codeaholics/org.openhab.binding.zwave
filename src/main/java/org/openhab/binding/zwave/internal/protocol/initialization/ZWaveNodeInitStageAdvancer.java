@@ -24,8 +24,8 @@ import org.eclipse.smarthome.config.core.ConfigDescriptionParameter;
 import org.eclipse.smarthome.core.thing.type.ThingType;
 import org.openhab.binding.zwave.ZWaveBindingConstants;
 import org.openhab.binding.zwave.internal.ZWaveConfigProvider;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage.SerialMessageClass;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage.MessageClass;
 import org.openhab.binding.zwave.internal.protocol.ZWaveAssociation;
 import org.openhab.binding.zwave.internal.protocol.ZWaveController;
 import org.openhab.binding.zwave.internal.protocol.ZWaveDeviceClass.Generic;
@@ -33,7 +33,7 @@ import org.openhab.binding.zwave.internal.protocol.ZWaveDeviceClass.Specific;
 import org.openhab.binding.zwave.internal.protocol.ZWaveEndpoint;
 import org.openhab.binding.zwave.internal.protocol.ZWaveEventListener;
 import org.openhab.binding.zwave.internal.protocol.ZWaveNode;
-import org.openhab.binding.zwave.internal.protocol.ZWaveSerialMessageException;
+import org.openhab.binding.zwave.internal.protocol.ZWaveByteMessageException;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveAssociationCommandClass;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveCommandClass;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveCommandClass.CommandClass;
@@ -54,14 +54,14 @@ import org.openhab.binding.zwave.internal.protocol.event.ZWaveInclusionEvent;
 import org.openhab.binding.zwave.internal.protocol.event.ZWaveInitializationStateEvent;
 import org.openhab.binding.zwave.internal.protocol.event.ZWaveNodeStatusEvent;
 import org.openhab.binding.zwave.internal.protocol.event.ZWaveTransactionCompletedEvent;
-import org.openhab.binding.zwave.internal.protocol.serialmessage.AssignReturnRouteMessageClass;
-import org.openhab.binding.zwave.internal.protocol.serialmessage.AssignSucReturnRouteMessageClass;
-import org.openhab.binding.zwave.internal.protocol.serialmessage.DeleteReturnRouteMessageClass;
-import org.openhab.binding.zwave.internal.protocol.serialmessage.DeleteSucReturnRouteMessageClass;
-import org.openhab.binding.zwave.internal.protocol.serialmessage.GetRoutingInfoMessageClass;
-import org.openhab.binding.zwave.internal.protocol.serialmessage.IdentifyNodeMessageClass;
-import org.openhab.binding.zwave.internal.protocol.serialmessage.IsFailedNodeMessageClass;
-import org.openhab.binding.zwave.internal.protocol.serialmessage.RequestNodeInfoMessageClass;
+import org.openhab.binding.zwave.internal.protocol.messages.AssignReturnRouteMessageClass;
+import org.openhab.binding.zwave.internal.protocol.messages.AssignSucReturnRouteMessageClass;
+import org.openhab.binding.zwave.internal.protocol.messages.DeleteReturnRouteMessageClass;
+import org.openhab.binding.zwave.internal.protocol.messages.DeleteSucReturnRouteMessageClass;
+import org.openhab.binding.zwave.internal.protocol.messages.GetRoutingInfoMessageClass;
+import org.openhab.binding.zwave.internal.protocol.messages.IdentifyNodeMessageClass;
+import org.openhab.binding.zwave.internal.protocol.messages.IsFailedNodeMessageClass;
+import org.openhab.binding.zwave.internal.protocol.messages.RequestNodeInfoMessageClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -128,7 +128,7 @@ public class ZWaveNodeInitStageAdvancer implements ZWaveEventListener {
     private boolean restoredFromConfigfile = false;
 
     private static final int MAX_BUFFFER_LEN = 256;
-    private ArrayBlockingQueue<SerialMessage> msgQueue;
+    private ArrayBlockingQueue<ByteMessage> msgQueue;
     private boolean freeToSend = true;
     private boolean stageAdvanced = true;
 
@@ -151,7 +151,7 @@ public class ZWaveNodeInitStageAdvancer implements ZWaveEventListener {
     /**
      * Used only by {@link ZWaveNodeInitStage#SECURITY_REPORT}
      */
-    private SerialMessage securityLastSentMessage;
+    private ByteMessage securityLastSentMessage;
 
     /**
      * Constructor. Creates a new instance of the ZWaveNodeStageAdvancer class.
@@ -169,7 +169,7 @@ public class ZWaveNodeInitStageAdvancer implements ZWaveEventListener {
         timer = new Timer();
 
         // Initialise the message queue
-        msgQueue = new ArrayBlockingQueue<SerialMessage>(MAX_BUFFFER_LEN, true);
+        msgQueue = new ArrayBlockingQueue<ByteMessage>(MAX_BUFFFER_LEN, true);
     }
 
     /**
@@ -205,9 +205,9 @@ public class ZWaveNodeInitStageAdvancer implements ZWaveEventListener {
      * before we get the response. The actual sending of frames, and the advancing is carried out in the
      * advanceNodeStage method.
      *
-     * @throws ZWaveSerialMessageException
+     * @throws ZWaveByteMessageException
      */
-    private void handleNodeQueue(SerialMessage incomingMessage) {
+    private void handleNodeQueue(ByteMessage incomingMessage) {
         // If initialisation is complete, then just return.
         // This probably shouldn't be necessary since we remove the event
         // handler when we're done, but just to be sure...
@@ -247,14 +247,14 @@ public class ZWaveNodeInitStageAdvancer implements ZWaveEventListener {
 
         // Check to see if we need to send a frame
         if (freeToSend == true) {
-            SerialMessage msg = msgQueue.peek();
+            ByteMessage msg = msgQueue.peek();
             if (msg != null) {
                 freeToSend = false;
 
                 logger.debug("NODE {}: Node advancer - queued packet. Queue length is {}", node.getNodeId(),
                         msgQueue.size());
 
-                if (msg.getMessageClass() == SerialMessageClass.SendData) {
+                if (msg.getMessageClass() == MessageClass.SendData) {
                     controller.sendData(msg);
                 } else {
                     controller.enqueue(msg);
@@ -274,9 +274,9 @@ public class ZWaveNodeInitStageAdvancer implements ZWaveEventListener {
      * one outstanding request. Again though, we can't be sure that a response is aligned with the node advancer request
      * so it is possible that more than one packet can be released at once, but it will constrain things.
      *
-     * @throws ZWaveSerialMessageException
+     * @throws ZWaveByteMessageException
      */
-    public void advanceNodeStage(SerialMessageClass eventClass) {
+    public void advanceNodeStage(MessageClass eventClass) {
         // If initialisation is complete, then just return.
         // This probably shouldn't be necessary since we remove the event handler when we're done, but just to be
         // sure...
@@ -351,7 +351,7 @@ public class ZWaveNodeInitStageAdvancer implements ZWaveEventListener {
 
                 case PROTOINFO:
                     // If the incoming frame is the IdentifyNode, then we continue
-                    if (eventClass == SerialMessageClass.IdentifyNode) {
+                    if (eventClass == MessageClass.IdentifyNode) {
                         break;
                     }
 
@@ -361,7 +361,7 @@ public class ZWaveNodeInitStageAdvancer implements ZWaveEventListener {
 
                 case INIT_NEIGHBORS:
                     // If the incoming frame is the GetRoutingInfo, then we continue
-                    if (eventClass == SerialMessageClass.GetRoutingInfo) {
+                    if (eventClass == MessageClass.GetRoutingInfo) {
                         break;
                     }
 
@@ -381,7 +381,7 @@ public class ZWaveNodeInitStageAdvancer implements ZWaveEventListener {
                     }
 
                     // If the incoming frame is the IsFailedNodeID, then we continue
-                    if (eventClass == SerialMessageClass.IsFailedNodeID) {
+                    if (eventClass == MessageClass.IsFailedNodeID) {
                         break;
                     }
 
@@ -417,7 +417,7 @@ public class ZWaveNodeInitStageAdvancer implements ZWaveEventListener {
                     // before requesting further information.
                     // It's not 100% guaranteed that this was our NoOp frame, but
                     // who cares!
-                    if (eventClass == SerialMessageClass.SendData) {
+                    if (eventClass == MessageClass.SendData) {
                         break;
                     }
 
@@ -428,7 +428,7 @@ public class ZWaveNodeInitStageAdvancer implements ZWaveEventListener {
                     }
 
                     logger.debug("NODE {}: Node advancer: PING - send NoOperation", node.getNodeId());
-                    SerialMessage msg = noOpCommandClass.getNoOperationMessage();
+                    ByteMessage msg = noOpCommandClass.getNoOperationMessage();
                     if (msg != null) {
                         // We only send out a single PING - no retries at controller
                         // level! This is to try and reduce network congestion during
@@ -444,7 +444,7 @@ public class ZWaveNodeInitStageAdvancer implements ZWaveEventListener {
 
                 case IDENTIFY_NODE:
                     // If the incoming frame is the IdentifyNode, then we continue
-                    if (eventClass == SerialMessageClass.IdentifyNode) {
+                    if (eventClass == MessageClass.IdentifyNode) {
                         break;
                     }
 
@@ -492,7 +492,7 @@ public class ZWaveNodeInitStageAdvancer implements ZWaveEventListener {
                         ZWaveSecurityCommandClassWithInitialization securityCommandClass = (ZWaveSecurityCommandClassWithInitialization) node
                                 .getCommandClass(CommandClass.SECURITY);
                         // For a node restored from a config file, this may or may not return a message
-                        Collection<SerialMessage> messageList = securityCommandClass.initialize(stageAdvanced);
+                        Collection<ByteMessage> messageList = securityCommandClass.initialize(stageAdvanced);
 
                         // Speed up retry timer as we use this to fetch outgoing messages instead of just retries
                         retryTimer = 400;
@@ -521,7 +521,7 @@ public class ZWaveNodeInitStageAdvancer implements ZWaveEventListener {
                             return; // Let ZWaveInputThread go back and wait for an incoming message
                         } else { // Add one or more messages to the queue
                             addToQueue(messageList);
-                            SerialMessage nextSecurityMessageToSend = messageList.iterator().next();
+                            ByteMessage nextSecurityMessageToSend = messageList.iterator().next();
                             if (!nextSecurityMessageToSend.equals(securityLastSentMessage)) {
                                 // Reset our retry count since this is a different message
                                 retryCount = 0;
@@ -926,7 +926,7 @@ public class ZWaveNodeInitStageAdvancer implements ZWaveEventListener {
 
                 case DELETE_SUC_ROUTES:
                     // If the incoming frame is the DeleteSUCReturnRoute, then we continue
-                    if (eventClass == SerialMessageClass.DeleteSUCReturnRoute) {
+                    if (eventClass == MessageClass.DeleteSUCReturnRoute) {
                         break;
                     }
 
@@ -940,7 +940,7 @@ public class ZWaveNodeInitStageAdvancer implements ZWaveEventListener {
                     break;
 
                 case SUC_ROUTE:
-                    if (eventClass == SerialMessageClass.AssignSucReturnRoute) {
+                    if (eventClass == MessageClass.AssignSucReturnRoute) {
                         break;
                     }
 
@@ -1058,7 +1058,7 @@ public class ZWaveNodeInitStageAdvancer implements ZWaveEventListener {
 
                 case DELETE_ROUTES:
                     // If the incoming frame is the DeleteReturnRoute, then we continue
-                    if (eventClass == SerialMessageClass.DeleteReturnRoute) {
+                    if (eventClass == MessageClass.DeleteReturnRoute) {
                         break;
                     }
 
@@ -1072,7 +1072,7 @@ public class ZWaveNodeInitStageAdvancer implements ZWaveEventListener {
 
                 case RETURN_ROUTES:
                     // If the incoming frame is the DeleteReturnRoute, then we continue
-                    if (eventClass == SerialMessageClass.AssignReturnRoute) {
+                    if (eventClass == MessageClass.AssignReturnRoute) {
                         break;
                     }
 
@@ -1086,7 +1086,7 @@ public class ZWaveNodeInitStageAdvancer implements ZWaveEventListener {
 
                 case NEIGHBORS:
                     // If the incoming frame is the IdentifyNode, then we continue
-                    if (eventClass == SerialMessageClass.GetRoutingInfo) {
+                    if (eventClass == MessageClass.GetRoutingInfo) {
                         break;
                     }
 
@@ -1160,7 +1160,7 @@ public class ZWaveNodeInitStageAdvancer implements ZWaveEventListener {
      * @param msgs
      *            the message collection
      */
-    private void addToQueue(SerialMessage serialMessage) {
+    private void addToQueue(ByteMessage serialMessage) {
         if (serialMessage == null) {
             return;
         }
@@ -1176,11 +1176,11 @@ public class ZWaveNodeInitStageAdvancer implements ZWaveEventListener {
      * @param msgs
      *            the message collection
      */
-    private void addToQueue(Collection<SerialMessage> msgs) {
+    private void addToQueue(Collection<ByteMessage> msgs) {
         if (msgs == null) {
             return;
         }
-        for (SerialMessage serialMessage : msgs) {
+        for (ByteMessage serialMessage : msgs) {
             addToQueue(serialMessage);
         }
     }
@@ -1195,11 +1195,11 @@ public class ZWaveNodeInitStageAdvancer implements ZWaveEventListener {
      * @param endpointId
      *            the endpoint number
      */
-    private void addToQueue(Collection<SerialMessage> msgs, ZWaveCommandClass commandClass, int endpointId) {
+    private void addToQueue(Collection<ByteMessage> msgs, ZWaveCommandClass commandClass, int endpointId) {
         if (msgs == null) {
             return;
         }
-        for (SerialMessage serialMessage : msgs) {
+        for (ByteMessage serialMessage : msgs) {
             addToQueue(node.encapsulate(serialMessage, commandClass, endpointId));
         }
     }
@@ -1269,7 +1269,7 @@ public class ZWaveNodeInitStageAdvancer implements ZWaveEventListener {
         if (event instanceof ZWaveTransactionCompletedEvent) {
             ZWaveTransactionCompletedEvent completeEvent = (ZWaveTransactionCompletedEvent) event;
 
-            SerialMessage serialMessage = completeEvent.getCompletedMessage();
+            ByteMessage serialMessage = completeEvent.getCompletedMessage();
             byte[] payload = serialMessage.getMessagePayload();
 
             // Make sure this is addressed to us

@@ -14,7 +14,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Test;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveCommandClass.CommandClass;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveMultiLevelSwitchCommandClass;
 
@@ -28,7 +28,7 @@ public class ZWaveMultiLevelSwitchCommandClassTest extends ZWaveCommandClassTest
     public void getValueMessage() {
         ZWaveMultiLevelSwitchCommandClass cls = (ZWaveMultiLevelSwitchCommandClass) getCommandClass(
                 CommandClass.SWITCH_MULTILEVEL);
-        SerialMessage msg;
+        ByteMessage msg;
 
         byte[] expectedResponseV1 = { 1, 9, 0, 19, 99, 2, 38, 2, 0, 0, -96 };
         cls.setVersion(1);
@@ -40,7 +40,7 @@ public class ZWaveMultiLevelSwitchCommandClassTest extends ZWaveCommandClassTest
     public void setValueMessage() {
         ZWaveMultiLevelSwitchCommandClass cls = (ZWaveMultiLevelSwitchCommandClass) getCommandClass(
                 CommandClass.SWITCH_MULTILEVEL);
-        SerialMessage msg;
+        ByteMessage msg;
 
         byte[] expectedResponseV1 = { 1, 10, 0, 19, 99, 3, 38, 1, 56, 0, 0, -103 };
         cls.setVersion(1);
@@ -52,7 +52,7 @@ public class ZWaveMultiLevelSwitchCommandClassTest extends ZWaveCommandClassTest
     public void startLevelChangeMessage() {
         ZWaveMultiLevelSwitchCommandClass cls = (ZWaveMultiLevelSwitchCommandClass) getCommandClass(
                 CommandClass.SWITCH_MULTILEVEL);
-        SerialMessage msg;
+        ByteMessage msg;
 
         byte[] expectedResponseV1 = { 1, 12, 0, 19, 99, 5, 38, 4, 32, 0, 43, 0, 0, -81 };
         cls.setVersion(1);
@@ -64,7 +64,7 @@ public class ZWaveMultiLevelSwitchCommandClassTest extends ZWaveCommandClassTest
     public void stopLevelChangeMessage() {
         ZWaveMultiLevelSwitchCommandClass cls = (ZWaveMultiLevelSwitchCommandClass) getCommandClass(
                 CommandClass.SWITCH_MULTILEVEL);
-        SerialMessage msg;
+        ByteMessage msg;
 
         byte[] expectedResponseV1 = { 1, 9, 0, 19, 99, 2, 38, 5, 0, 0, -89 };
         cls.setVersion(1);
@@ -76,7 +76,7 @@ public class ZWaveMultiLevelSwitchCommandClassTest extends ZWaveCommandClassTest
     public void getSupportedMessage() {
         ZWaveMultiLevelSwitchCommandClass cls = (ZWaveMultiLevelSwitchCommandClass) getCommandClass(
                 CommandClass.SWITCH_MULTILEVEL);
-        SerialMessage msg;
+        ByteMessage msg;
 
         byte[] expectedResponseV3 = { 1, 9, 0, 19, 99, 2, 38, 6, 0, 0, -92 };
         cls.setVersion(3);
@@ -88,7 +88,7 @@ public class ZWaveMultiLevelSwitchCommandClassTest extends ZWaveCommandClassTest
     public void initialize() {
         ZWaveMultiLevelSwitchCommandClass cls = (ZWaveMultiLevelSwitchCommandClass) getCommandClass(
                 CommandClass.SWITCH_MULTILEVEL);
-        Collection<SerialMessage> msgs;
+        Collection<ByteMessage> msgs;
 
         cls.setVersion(1);
         msgs = cls.initialize(true);

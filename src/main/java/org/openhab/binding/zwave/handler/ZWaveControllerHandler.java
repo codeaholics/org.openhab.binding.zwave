@@ -40,7 +40,7 @@ import org.openhab.binding.zwave.event.BindingEventFactory;
 import org.openhab.binding.zwave.event.BindingEventType;
 import org.openhab.binding.zwave.internal.ZWaveConfigProvider;
 import org.openhab.binding.zwave.internal.ZWaveEventPublisher;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
 import org.openhab.binding.zwave.internal.protocol.ZWaveController;
 import org.openhab.binding.zwave.internal.protocol.ZWaveEventListener;
 import org.openhab.binding.zwave.internal.protocol.ZWaveIoHandler;
@@ -52,7 +52,7 @@ import org.openhab.binding.zwave.internal.protocol.event.ZWaveInitializationStat
 import org.openhab.binding.zwave.internal.protocol.event.ZWaveNetworkEvent;
 import org.openhab.binding.zwave.internal.protocol.event.ZWaveNetworkStateEvent;
 import org.openhab.binding.zwave.internal.protocol.initialization.ZWaveNodeInitStage;
-import org.openhab.binding.zwave.internal.protocol.serialmessage.RemoveFailedNodeMessageClass.Report;
+import org.openhab.binding.zwave.internal.protocol.messages.RemoveFailedNodeMessageClass.Report;
 import org.osgi.framework.ServiceRegistration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -570,7 +570,7 @@ public abstract class ZWaveControllerHandler extends BaseBridgeHandler implement
         }
     }
 
-    protected void incomingMessage(SerialMessage serialMessage) {
+    protected void incomingMessage(ByteMessage serialMessage) {
         if (controller == null) {
             return;
         }
@@ -622,7 +622,7 @@ public abstract class ZWaveControllerHandler extends BaseBridgeHandler implement
         return controller.getNodes();
     }
 
-    public void sendData(SerialMessage message) {
+    public void sendData(ByteMessage message) {
         if (controller == null) {
             return;
         }

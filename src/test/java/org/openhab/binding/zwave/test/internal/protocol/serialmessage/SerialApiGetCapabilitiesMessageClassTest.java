@@ -13,8 +13,8 @@ import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 
 import org.junit.Test;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
-import org.openhab.binding.zwave.internal.protocol.serialmessage.SerialApiGetCapabilitiesMessageClass;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
+import org.openhab.binding.zwave.internal.protocol.messages.SerialApiGetCapabilitiesMessageClass;
 
 /**
  * Test cases for EnableSUCMessageClass message.
@@ -28,7 +28,7 @@ public class SerialApiGetCapabilitiesMessageClassTest {
     public void doRequest() {
         byte[] expectedResponse = { 1, 3, 0, 7, -5 };
 
-        SerialMessage msg;
+        ByteMessage msg;
         SerialApiGetCapabilitiesMessageClass handler = new SerialApiGetCapabilitiesMessageClass();
 
         msg = handler.doRequest();

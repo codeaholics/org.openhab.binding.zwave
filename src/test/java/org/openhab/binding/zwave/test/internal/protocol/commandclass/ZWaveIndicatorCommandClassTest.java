@@ -13,7 +13,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 
 import org.junit.Test;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveCommandClass.CommandClass;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveIndicatorCommandClass;
 
@@ -27,7 +27,7 @@ public class ZWaveIndicatorCommandClassTest extends ZWaveCommandClassTest {
     @Test
     public void getValueMessage() {
         ZWaveIndicatorCommandClass cls = (ZWaveIndicatorCommandClass) getCommandClass(CommandClass.INDICATOR);
-        SerialMessage msg;
+        ByteMessage msg;
 
         byte[] expectedResponseV1 = { 1, 9, 0, 19, 99, 2, -121, 2, 0, 0, 1 };
         cls.setVersion(1);
@@ -39,7 +39,7 @@ public class ZWaveIndicatorCommandClassTest extends ZWaveCommandClassTest {
     @Test
     public void setValueMessage() {
         ZWaveIndicatorCommandClass cls = (ZWaveIndicatorCommandClass) getCommandClass(CommandClass.INDICATOR);
-        SerialMessage msg;
+        ByteMessage msg;
 
         byte[] expectedResponseV1 = { 1, 10, 0, 19, 99, 3, -121, 1, 34, 0, 0, 34 };
         cls.setVersion(1);

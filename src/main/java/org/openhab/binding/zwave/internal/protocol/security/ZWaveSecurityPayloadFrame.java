@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
 import org.openhab.binding.zwave.internal.protocol.ZWaveNode;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveCommandClass.CommandClass;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveSecurityCommandClass;
@@ -22,7 +22,7 @@ import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveSecurityCom
  * Used only by {@link ZWaveSecurityCommandClass}
  *
  * ZWave security protocol that certain messages be "security encapsulated"
- * (that is, encrypted and signed). The first step to send a {@link SerialMessage}
+ * (that is, encrypted and signed). The first step to send a {@link ByteMessage}
  * securely is break down the payload into one or more security payload frames
  * that will then be queued up in {@link ZWaveSecurityCommandClass} to await
  * {@link ZWaveSecurityCommandClass#SECURITY_NONCE_REPORT} messages from the
@@ -36,7 +36,7 @@ public class ZWaveSecurityPayloadFrame {
     private static final long MESSAGE_EXPIRATION_MS = TimeUnit.MINUTES.toMillis(2);
     /**
      * The largest amount of payload we can fit into a single
-     * {@link ZWaveSecurityPayloadFrame}. {@link SerialMessage} contents larger than this
+     * {@link ZWaveSecurityPayloadFrame}. {@link ByteMessage} contents larger than this
      * must be split into multiple {@link ZWaveSecurityPayloadFrame}
      */
     private static final int SECURITY_PAYLOAD_ONE_PART_SIZE = 28;
@@ -64,10 +64,10 @@ public class ZWaveSecurityPayloadFrame {
     private final int totalParts;
     private final byte sequenceByte;
     private final byte[] partBytes;
-    private final SerialMessage originalMessage;
+    private final ByteMessage originalMessage;
 
     public static List<ZWaveSecurityPayloadFrame> convertToSecurityPayload(ZWaveNode node,
-            SerialMessage messageToEncapsulate) {
+            ByteMessage messageToEncapsulate) {
         // We need to start with command class byte, so strip off node ID and length from beginning
         int copyLength = messageToEncapsulate.getMessagePayload().length - 2;
         byte[] payloadBuffer = new byte[copyLength];
@@ -108,7 +108,7 @@ public class ZWaveSecurityPayloadFrame {
     }
 
     private ZWaveSecurityPayloadFrame(ZWaveNode node, int partNumber, int totalParts, byte[] partBuffer,
-            byte sequenceByte, SerialMessage originalMessage) {
+            byte sequenceByte, ByteMessage originalMessage) {
         this.originalMessage = originalMessage;
         this.partNumber = partNumber;
         this.partBytes = partBuffer;
@@ -127,7 +127,7 @@ public class ZWaveSecurityPayloadFrame {
         if (index > 0) {
             ourSerialMessageString = ourSerialMessageString.substring(0, index);
             ourSerialMessageString = new StringBuilder(ourSerialMessageString).append("payload = ")
-                    .append(SerialMessage.bb2hex(partBytes)).toString();
+                    .append(ByteMessage.bb2hex(partBytes)).toString();
         }
 
         this.logMessage = String.format("NODE %s: SecurityPayload (part %d of %d) for %s : %s", node.getNodeId(),
@@ -135,7 +135,7 @@ public class ZWaveSecurityPayloadFrame {
                 ourSerialMessageString);
     }
 
-    private ZWaveSecurityPayloadFrame(ZWaveNode node, byte[] messageBuffer, SerialMessage originalMessage) {
+    private ZWaveSecurityPayloadFrame(ZWaveNode node, byte[] messageBuffer, ByteMessage originalMessage) {
         this(node, 1, 1, messageBuffer, SEQUENCE_BYTE_FOR_SINGLE_FRAME_MESSAGE, originalMessage);
     }
 
@@ -172,7 +172,7 @@ public class ZWaveSecurityPayloadFrame {
         return expirationTime;
     }
 
-    public SerialMessage getOriginalMessage() {
+    public ByteMessage getOriginalMessage() {
         return originalMessage;
     }
 }

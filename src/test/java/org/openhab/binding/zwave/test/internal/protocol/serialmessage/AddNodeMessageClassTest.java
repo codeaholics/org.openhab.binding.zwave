@@ -13,8 +13,8 @@ import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 
 import org.junit.Test;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
-import org.openhab.binding.zwave.internal.protocol.serialmessage.AddNodeMessageClass;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
+import org.openhab.binding.zwave.internal.protocol.messages.AddNodeMessageClass;
 
 /**
  * Test cases for AddNodeMessageClass message.
@@ -31,7 +31,7 @@ public class AddNodeMessageClassTest {
         byte[] expectedResponseStartNetwork = { 1, 5, 0, 74, -63, 1, 112 };
         byte[] expectedResponseStop = { 1, 5, 0, 74, 5, 1, -76 };
 
-        SerialMessage msg;
+        ByteMessage msg;
         AddNodeMessageClass handler = new AddNodeMessageClass();
 
         msg = handler.doRequestStart(false, false);

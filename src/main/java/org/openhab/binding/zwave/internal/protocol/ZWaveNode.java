@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.openhab.binding.zwave.internal.HexToIntegerConverter;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage.SerialMessageClass;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage.MessageClass;
 import org.openhab.binding.zwave.internal.protocol.ZWaveDeviceClass.Basic;
 import org.openhab.binding.zwave.internal.protocol.ZWaveDeviceClass.Generic;
 import org.openhab.binding.zwave.internal.protocol.ZWaveDeviceClass.Specific;
@@ -608,7 +608,7 @@ public class ZWaveNode {
      * @param node the destination node.
      * @return SerialMessage on success, null on failure.
      */
-    public SerialMessage encapsulate(SerialMessage serialMessage, ZWaveCommandClass commandClass, int endpointId) {
+    public ByteMessage encapsulate(ByteMessage serialMessage, ZWaveCommandClass commandClass, int endpointId) {
         ZWaveMultiInstanceCommandClass multiInstanceCommandClass;
 
         if (serialMessage == null) {
@@ -846,7 +846,7 @@ public class ZWaveNode {
      */
     public void setSecuredClasses(byte[] data) {
         logger.debug("NODE {}:  Setting secured command classes for node with {}", this.getNodeId(),
-                SerialMessage.bb2hex(data));
+                ByteMessage.bb2hex(data));
         boolean afterMark = false;
         securedCommandClasses.clear(); // reset the existing list
         for (final byte aByte : data) {
@@ -907,9 +907,9 @@ public class ZWaveNode {
         }
     }
 
-    public boolean doesMessageRequireSecurityEncapsulation(SerialMessage serialMessage) {
+    public boolean doesMessageRequireSecurityEncapsulation(ByteMessage serialMessage) {
         boolean result = false;
-        if (serialMessage.getMessageClass() != SerialMessageClass.SendData) {
+        if (serialMessage.getMessageClass() != MessageClass.SendData) {
             result = false;
         } else if (!supportedCommandClasses.containsKey(CommandClass.SECURITY)) {
             // Does this node support security at all?
@@ -918,7 +918,7 @@ public class ZWaveNode {
             int commandClassCode;
             try {
                 commandClassCode = (byte) serialMessage.getMessagePayloadByte(2) & 0xFF;
-            } catch (ZWaveSerialMessageException e) {
+            } catch (ZWaveByteMessageException e) {
                 logger.error("NODE {}: Exception processing message. Treating as INSECURE %s", getNodeId(),
                         e.getMessage());
                 return false;
@@ -934,7 +934,7 @@ public class ZWaveNode {
                 try {
                     final Byte messageCode = Byte.valueOf((byte) (serialMessage.getMessagePayloadByte(3) & 0xFF));
                     result = ZWaveSecurityCommandClass.doesCommandRequireSecurityEncapsulation(messageCode);
-                } catch (ZWaveSerialMessageException e) {
+                } catch (ZWaveByteMessageException e) {
                     logger.error("NODE {}: Exception processing message. Treating as INSECURE %s", getNodeId(),
                             e.getMessage());
                     return false;
@@ -990,7 +990,7 @@ public class ZWaveNode {
         return associationGroups;
     }
 
-    public SerialMessage getAssociation(int group) {
+    public ByteMessage getAssociation(int group) {
         ZWaveMultiAssociationCommandClass multiAssociationCommandClass = (ZWaveMultiAssociationCommandClass) getCommandClass(
                 CommandClass.MULTI_INSTANCE_ASSOCIATION);
         if (multiAssociationCommandClass != null) {
@@ -1021,7 +1021,7 @@ public class ZWaveNode {
      * @param endpointId the endpoint to be set to report to (receive)
      * @return
      */
-    public SerialMessage setAssociation(ZWaveEndpoint endpoint, int groupId, int nodeId, int endpointId) {
+    public ByteMessage setAssociation(ZWaveEndpoint endpoint, int groupId, int nodeId, int endpointId) {
         ZWaveMultiAssociationCommandClass multiAssociationCommandClass = (ZWaveMultiAssociationCommandClass) getCommandClass(
                 CommandClass.MULTI_INSTANCE_ASSOCIATION);
         if (multiAssociationCommandClass != null) {
@@ -1043,7 +1043,7 @@ public class ZWaveNode {
         return null;
     }
 
-    public SerialMessage removeAssociation(Integer groupId, int nodeId, int endpointId) {
+    public ByteMessage removeAssociation(Integer groupId, int nodeId, int endpointId) {
         ZWaveMultiAssociationCommandClass multiAssociationCommandClass = (ZWaveMultiAssociationCommandClass) getCommandClass(
                 CommandClass.MULTI_INSTANCE_ASSOCIATION);
         if (multiAssociationCommandClass != null) {
@@ -1059,7 +1059,7 @@ public class ZWaveNode {
         return null;
     }
 
-    public SerialMessage clearAssociation(Integer groupId) {
+    public ByteMessage clearAssociation(Integer groupId) {
         ZWaveMultiAssociationCommandClass multiAssociationCommandClass = (ZWaveMultiAssociationCommandClass) getCommandClass(
                 CommandClass.MULTI_INSTANCE_ASSOCIATION);
         if (multiAssociationCommandClass != null) {

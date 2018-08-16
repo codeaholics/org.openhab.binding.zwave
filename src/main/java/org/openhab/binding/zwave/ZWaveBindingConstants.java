@@ -29,6 +29,7 @@ public class ZWaveBindingConstants {
 
     // Controllers
     public final static ThingTypeUID CONTROLLER_SERIAL = new ThingTypeUID(BINDING_ID, "serial_zstick");
+    public final static ThingTypeUID CONTROLLER_TCP = new ThingTypeUID(BINDING_ID, "tcp_zstick");
 
     public final static String CONFIGURATION_PORT = "port";
     public final static String CONFIGURATION_MASTER = "controller_master";
@@ -156,7 +157,8 @@ public class ZWaveBindingConstants {
                     + "Note that the polling period may be longer than set since the binding treats "
                     + "polls as the lowest priority data within the network.");
 
-    public final static Set<ThingTypeUID> SUPPORTED_BRIDGE_TYPES_UIDS = ImmutableSet.of(CONTROLLER_SERIAL);
+    public final static Set<ThingTypeUID> SUPPORTED_BRIDGE_TYPES_UIDS = ImmutableSet.of(CONTROLLER_SERIAL,
+            CONTROLLER_TCP);
 
     private static TranslationProvider translationProvider;
 

@@ -12,15 +12,15 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage.SerialMessageClass;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage.SerialMessagePriority;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage.SerialMessageType;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage.MessageClass;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage.ByteMessagePriority;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage.ByteMessageType;
 import org.openhab.binding.zwave.internal.protocol.ZWaveConfigurationParameter;
 import org.openhab.binding.zwave.internal.protocol.ZWaveController;
 import org.openhab.binding.zwave.internal.protocol.ZWaveEndpoint;
 import org.openhab.binding.zwave.internal.protocol.ZWaveNode;
-import org.openhab.binding.zwave.internal.protocol.ZWaveSerialMessageException;
+import org.openhab.binding.zwave.internal.protocol.ZWaveByteMessageException;
 import org.openhab.binding.zwave.internal.protocol.event.ZWaveCommandClassValueEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,11 +71,11 @@ public class ZWaveConfigurationCommandClass extends ZWaveCommandClass {
     /**
      * {@inheritDoc}
      *
-     * @throws ZWaveSerialMessageException
+     * @throws ZWaveByteMessageException
      */
     @Override
-    public void handleApplicationCommandRequest(SerialMessage serialMessage, int offset, int endpoint)
-            throws ZWaveSerialMessageException {
+    public void handleApplicationCommandRequest(ByteMessage serialMessage, int offset, int endpoint)
+            throws ZWaveByteMessageException {
         logger.debug("NODE {}: Received Configuration Request", getNode().getNodeId());
         int command = serialMessage.getMessagePayloadByte(offset);
         switch (command) {
@@ -100,10 +100,10 @@ public class ZWaveConfigurationCommandClass extends ZWaveCommandClass {
      *            the offset position from which to start message processing.
      * @param endpoint
      *            the endpoint or instance number this message is meant for.
-     * @throws ZWaveSerialMessageException
+     * @throws ZWaveByteMessageException
      */
-    private void processConfigurationReport(SerialMessage serialMessage, int offset)
-            throws ZWaveSerialMessageException {
+    private void processConfigurationReport(ByteMessage serialMessage, int offset)
+            throws ZWaveByteMessageException {
         // Extract the parameter index and value
         int parameter = serialMessage.getMessagePayloadByte(offset + 1);
         int size = serialMessage.getMessagePayloadByte(offset + 2);
@@ -146,7 +146,7 @@ public class ZWaveConfigurationCommandClass extends ZWaveCommandClass {
      *
      * @return the serial message
      */
-    public SerialMessage getConfigMessage(int parameter) {
+    public ByteMessage getConfigMessage(int parameter) {
         // Check if the parameter exists in our list
         ZWaveConfigurationParameter configurationParameter = configParameters.get(parameter);
         if (configurationParameter != null && configurationParameter.getWriteOnly() == true) {
@@ -157,8 +157,8 @@ public class ZWaveConfigurationCommandClass extends ZWaveCommandClass {
 
         logger.debug("NODE {}: Creating new message for application command CONFIGURATIONCMD_GET",
                 getNode().getNodeId());
-        SerialMessage result = new SerialMessage(getNode().getNodeId(), SerialMessageClass.SendData,
-                SerialMessageType.Request, SerialMessageClass.ApplicationCommandHandler, SerialMessagePriority.Config);
+        ByteMessage result = new ByteMessage(getNode().getNodeId(), MessageClass.SendData,
+                ByteMessageType.Request, MessageClass.ApplicationCommandHandler, ByteMessagePriority.Config);
         byte[] newPayload = { (byte) getNode().getNodeId(), 3, (byte) getCommandClass().getKey(),
                 (byte) CONFIGURATIONCMD_GET, (byte) (parameter & 0xff) };
         result.setMessagePayload(newPayload);
@@ -171,7 +171,7 @@ public class ZWaveConfigurationCommandClass extends ZWaveCommandClass {
      * @param parameter the parameter to set.
      * @return the serial message
      */
-    public SerialMessage setConfigMessage(ZWaveConfigurationParameter parameter) {
+    public ByteMessage setConfigMessage(ZWaveConfigurationParameter parameter) {
         if (parameter != null && parameter.getReadOnly() == true) {
             logger.debug("NODE {}: CONFIGURATIONCMD_SET ignored for parameter {} - parameter is read only",
                     getNode().getNodeId(), parameter);
@@ -180,8 +180,8 @@ public class ZWaveConfigurationCommandClass extends ZWaveCommandClass {
 
         logger.debug("NODE {}: Creating new message for application command CONFIGURATIONCMD_SET",
                 getNode().getNodeId());
-        SerialMessage result = new SerialMessage(getNode().getNodeId(), SerialMessageClass.SendData,
-                SerialMessageType.Request, SerialMessageClass.SendData, SerialMessagePriority.Config);
+        ByteMessage result = new ByteMessage(getNode().getNodeId(), MessageClass.SendData,
+                ByteMessageType.Request, MessageClass.SendData, ByteMessagePriority.Config);
         byte[] newPayload = new byte[parameter.getSize() + 6];
         newPayload[0] = (byte) getNode().getNodeId();
         newPayload[1] = (byte) (4 + parameter.getSize());

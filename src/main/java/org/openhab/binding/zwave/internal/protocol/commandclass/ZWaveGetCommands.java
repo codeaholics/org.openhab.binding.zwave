@@ -8,7 +8,7 @@
  */
 package org.openhab.binding.zwave.internal.protocol.commandclass;
 
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
 
 /**
  * Interface to implement for all command classes that implement the Get command.
@@ -22,5 +22,5 @@ public interface ZWaveGetCommands {
      * 
      * @return the serial message
      */
-    public SerialMessage getValueMessage();
+    public ByteMessage getValueMessage();
 }

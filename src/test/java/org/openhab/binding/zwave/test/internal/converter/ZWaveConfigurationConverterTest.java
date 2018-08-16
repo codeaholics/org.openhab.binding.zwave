@@ -24,12 +24,12 @@ import org.mockito.Mockito;
 import org.openhab.binding.zwave.handler.ZWaveThingChannel;
 import org.openhab.binding.zwave.handler.ZWaveThingChannel.DataType;
 import org.openhab.binding.zwave.internal.converter.ZWaveConfigurationConverter;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
 import org.openhab.binding.zwave.internal.protocol.ZWaveConfigurationParameter;
 import org.openhab.binding.zwave.internal.protocol.ZWaveController;
 import org.openhab.binding.zwave.internal.protocol.ZWaveEndpoint;
 import org.openhab.binding.zwave.internal.protocol.ZWaveNode;
-import org.openhab.binding.zwave.internal.protocol.ZWaveSerialMessageException;
+import org.openhab.binding.zwave.internal.protocol.ZWaveByteMessageException;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveCommandClass;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveCommandClass.CommandClass;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveConfigurationCommandClass;
@@ -80,7 +80,7 @@ public class ZWaveConfigurationConverterTest extends ZWaveCommandClassConverterT
         ZWaveThingChannel channel = createChannel("2");
         ZWaveNode node = CreateMockedNode(1, null);
 
-        List<SerialMessage> msgs = converter.executeRefresh(channel, node);
+        List<ByteMessage> msgs = converter.executeRefresh(channel, node);
 
         assertEquals(1, msgs.size());
         msgs.get(0).setCallbackId(0);
@@ -99,17 +99,17 @@ public class ZWaveConfigurationConverterTest extends ZWaveCommandClassConverterT
         ZWaveConfigurationCommandClass configCommandClass = (ZWaveConfigurationCommandClass) node
                 .resolveCommandClass(ZWaveCommandClass.CommandClass.CONFIGURATION, channel.getEndpoint());
 
-        SerialMessage report = new SerialMessage();
+        ByteMessage report = new ByteMessage();
         report.setMessagePayload(new byte[] { 6, 2, 4, 0, 0, 0, 0 });
         try {
             configCommandClass.handleApplicationCommandRequest(report, 0, 0);
-        } catch (ZWaveSerialMessageException e) {
+        } catch (ZWaveByteMessageException e) {
             e.printStackTrace();
         }
 
         DecimalType command = new DecimalType(44);
 
-        List<SerialMessage> msgs = converter.receiveCommand(channel, node, command);
+        List<ByteMessage> msgs = converter.receiveCommand(channel, node, command);
 
         assertEquals(2, msgs.size());
         msgs.get(0).setCallbackId(0);

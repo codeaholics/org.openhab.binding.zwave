@@ -13,8 +13,8 @@ import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 
 import org.junit.Test;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
-import org.openhab.binding.zwave.internal.protocol.serialmessage.GetRoutingInfoMessageClass;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
+import org.openhab.binding.zwave.internal.protocol.messages.GetRoutingInfoMessageClass;
 
 /**
  * Test cases for GetRoutingInfoMessageClass message.
@@ -28,7 +28,7 @@ public class GetRoutingInfoMessageClassTest {
     public void doRequest() {
         byte[] expectedResponse = { 1, 7, 0, -128, 1, 0, 0, 3, 122 };
 
-        SerialMessage msg;
+        ByteMessage msg;
         GetRoutingInfoMessageClass handler = new GetRoutingInfoMessageClass();
 
         msg = handler.doRequest(1);

@@ -16,12 +16,12 @@ import java.util.List;
 
 import org.junit.Test;
 import org.mockito.Matchers;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage.SerialMessageClass;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage.SerialMessageType;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage.MessageClass;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage.ByteMessageType;
 import org.openhab.binding.zwave.internal.protocol.ZWaveAssociationGroup;
 import org.openhab.binding.zwave.internal.protocol.ZWaveNode;
-import org.openhab.binding.zwave.internal.protocol.ZWaveSerialMessageException;
+import org.openhab.binding.zwave.internal.protocol.ZWaveByteMessageException;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveAssociationGroupInfoCommandClass;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveCommandClass;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveCommandClass.CommandClass;
@@ -62,8 +62,8 @@ public class ZWaveAssociationGroupInfoCommandClassTest extends ZWaveCommandClass
                 .getInstance(CommandClass.ASSOCIATION_GROUP_INFO.getKey(), node, null);
 
         // Let our CC process the messages
-        processCommandClassMessages(cls, Arrays.asList(new SerialMessage(groupName), new SerialMessage(groupProfile),
-                new SerialMessage(groupCommands)));
+        processCommandClassMessages(cls, Arrays.asList(new ByteMessage(groupName), new ByteMessage(groupProfile),
+                new ByteMessage(groupCommands)));
 
         // See if we got the expected results
         assertEquals("Lifeline", group.getName());
@@ -73,22 +73,22 @@ public class ZWaveAssociationGroupInfoCommandClassTest extends ZWaveCommandClass
         assertEquals(true, cls.getAutoSubscribeGroups().contains(1));
     }
 
-    protected void processCommandClassMessages(ZWaveCommandClass cls, List<SerialMessage> msgs) {
+    protected void processCommandClassMessages(ZWaveCommandClass cls, List<ByteMessage> msgs) {
         assertNotNull(cls);
 
-        for (SerialMessage msg : msgs) {
+        for (ByteMessage msg : msgs) {
 
             // Check the packet is not corrupted and is a command class request
             assertEquals(true, msg.isValid);
-            assertEquals(SerialMessageType.Request, msg.getMessageType());
-            assertEquals(SerialMessageClass.ApplicationCommandHandler, msg.getMessageClass());
+            assertEquals(ByteMessageType.Request, msg.getMessageType());
+            assertEquals(MessageClass.ApplicationCommandHandler, msg.getMessageClass());
 
             try {
                 // ensure our message is for the correct command class
                 assertEquals(cls.getCommandClass().getKey(), msg.getMessagePayloadByte(3));
 
                 cls.handleApplicationCommandRequest(msg, 4, 0);
-            } catch (ZWaveSerialMessageException e) {
+            } catch (ZWaveByteMessageException e) {
                 fail("Out of bounds exception processing data");
             }
         }
@@ -98,7 +98,7 @@ public class ZWaveAssociationGroupInfoCommandClassTest extends ZWaveCommandClass
     public void getGroupNameMessage() {
         ZWaveAssociationGroupInfoCommandClass cls = (ZWaveAssociationGroupInfoCommandClass) getCommandClass(
                 CommandClass.ASSOCIATION_GROUP_INFO);
-        SerialMessage msg;
+        ByteMessage msg;
 
         byte[] expectedResponseV1 = { 1, 10, 0, 19, 99, 3, 89, 1, 1, 0, 0, -33 };
         cls.setVersion(1);
@@ -110,7 +110,7 @@ public class ZWaveAssociationGroupInfoCommandClassTest extends ZWaveCommandClass
     public void getCommandListMessage() {
         ZWaveAssociationGroupInfoCommandClass cls = (ZWaveAssociationGroupInfoCommandClass) getCommandClass(
                 CommandClass.ASSOCIATION_GROUP_INFO);
-        SerialMessage msg;
+        ByteMessage msg;
 
         byte[] expectedResponseV1 = { 1, 11, 0, 19, 99, 4, 89, 5, 0, 1, 0, 0, -35 };
         cls.setVersion(1);
@@ -122,7 +122,7 @@ public class ZWaveAssociationGroupInfoCommandClassTest extends ZWaveCommandClass
     public void getInfoMessage() {
         ZWaveAssociationGroupInfoCommandClass cls = (ZWaveAssociationGroupInfoCommandClass) getCommandClass(
                 CommandClass.ASSOCIATION_GROUP_INFO);
-        SerialMessage msg;
+        ByteMessage msg;
 
         byte[] expectedResponseV1 = { 1, 11, 0, 19, 99, 4, 89, 3, 0, 1, 0, 0, -37 };
         cls.setVersion(1);

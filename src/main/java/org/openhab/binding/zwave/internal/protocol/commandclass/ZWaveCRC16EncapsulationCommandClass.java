@@ -11,11 +11,11 @@ package org.openhab.binding.zwave.internal.protocol.commandclass;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
 import org.openhab.binding.zwave.internal.protocol.ZWaveController;
 import org.openhab.binding.zwave.internal.protocol.ZWaveEndpoint;
 import org.openhab.binding.zwave.internal.protocol.ZWaveNode;
-import org.openhab.binding.zwave.internal.protocol.ZWaveSerialMessageException;
+import org.openhab.binding.zwave.internal.protocol.ZWaveByteMessageException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,11 +61,11 @@ public class ZWaveCRC16EncapsulationCommandClass extends ZWaveCommandClass {
     /**
      * {@inheritDoc}
      *
-     * @throws ZWaveSerialMessageException
+     * @throws ZWaveByteMessageException
      */
     @Override
-    public void handleApplicationCommandRequest(SerialMessage serialMessage, int offset, int endpointId)
-            throws ZWaveSerialMessageException {
+    public void handleApplicationCommandRequest(ByteMessage serialMessage, int offset, int endpointId)
+            throws ZWaveByteMessageException {
         logger.debug("NODE {}: Received CRC 16 Encapsulation Request", this.getNode().getNodeId());
         int command = serialMessage.getMessagePayloadByte(offset);
         switch (command) {
@@ -83,9 +83,9 @@ public class ZWaveCRC16EncapsulationCommandClass extends ZWaveCommandClass {
      *            The received message
      * @param offset
      *            The starting offset into the payload
-     * @throws ZWaveSerialMessageException
+     * @throws ZWaveByteMessageException
      */
-    private void handleCRC16EncapResponse(SerialMessage serialMessage, int offset) throws ZWaveSerialMessageException {
+    private void handleCRC16EncapResponse(ByteMessage serialMessage, int offset) throws ZWaveByteMessageException {
         logger.trace("Process CRC16 Encapsulation");
 
         // calculate CRC
@@ -99,7 +99,7 @@ public class ZWaveCRC16EncapsulationCommandClass extends ZWaveCommandClass {
         byteBuffer.putShort(calculatedCrc);
         if (!Arrays.equals(messageCrc, byteBuffer.array())) {
             logger.debug("NODE {}: CRC check failed message contains {} but should be {}", this.getNode().getNodeId(),
-                    SerialMessage.bb2hex(messageCrc), SerialMessage.bb2hex(byteBuffer.array()));
+                    ByteMessage.bb2hex(messageCrc), ByteMessage.bb2hex(byteBuffer.array()));
             return;
         }
 

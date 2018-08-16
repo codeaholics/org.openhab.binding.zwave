@@ -10,21 +10,21 @@ package org.openhab.binding.zwave.internal.protocol.security;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveCommandClass.CommandClass;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveSecurityCommandClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A {@link SerialMessage} which has been security encapsulated per the
+ * A {@link ByteMessage} which has been security encapsulated per the
  * semantics of the zwave spec.
  *
  * @author Dave Badia
  * @author Chris Jackson
  * @see ZWaveSecurityCommandClass
  */
-public class SecurityEncapsulatedSerialMessage extends SerialMessage {
+public class SecurityEncapsulatedSerialMessage extends ByteMessage {
     private final static Logger logger = LoggerFactory.getLogger(SecurityEncapsulatedSerialMessage.class);
 
     private static final byte UNSET = -1;
@@ -32,7 +32,7 @@ public class SecurityEncapsulatedSerialMessage extends SerialMessage {
     /**
      * The original message that was encapsulated in {@link ZWaveSecurityCommandClass} encapsulated messages
      */
-    private SerialMessage messageBeingEncapsulated = null;
+    private ByteMessage messageBeingEncapsulated = null;
 
     /**
      * The command class that, when received, indicates that this security transaction is complete
@@ -59,8 +59,8 @@ public class SecurityEncapsulatedSerialMessage extends SerialMessage {
     private ZWaveSecurityPayloadFrame securityPayload;
 
     // TODO: DB inherit messageClass and messageType too?
-    public SecurityEncapsulatedSerialMessage(SerialMessageClass messageClass, SerialMessageType messageType,
-            SerialMessage messageBeingEncapsulated) {
+    public SecurityEncapsulatedSerialMessage(MessageClass messageClass, ByteMessageType messageType,
+            ByteMessage messageBeingEncapsulated) {
         // Inherit most fields
         super(messageBeingEncapsulated.getMessageNode(), messageClass, messageType,
                 messageBeingEncapsulated.getExpectedReply(), ZWaveSecurityCommandClass.SECURITY_MESSAGE_PRIORITY);
@@ -81,7 +81,7 @@ public class SecurityEncapsulatedSerialMessage extends SerialMessage {
         }
         logger.debug(
                 "NODE {}: securityTransactionComplete={}, payload=({}), transmitted={}, msSinceTransmitted={}, ackWaiting={}",
-                messageNode, result, SerialMessage.bb2hex(messageBeingEncapsulated.getMessagePayload()),
+                messageNode, result, ByteMessage.bb2hex(messageBeingEncapsulated.getMessagePayload()),
                 hasBeenTransmitted(), hasBeenTransmitted() ? (System.currentTimeMillis() - getTransmittedAt()) : "",
                 ackPending);
         return result;
@@ -103,11 +103,11 @@ public class SecurityEncapsulatedSerialMessage extends SerialMessage {
             result = ZWaveSecurityCommandClass.bytesAreEqual(transactionCompleteCommand, payloadBytes[3]);
         }
         logger.debug("NODE {}: securityReponseReceived={} for {}. Class: want={},got={}; Command: want={},got={}",
-                getMessageNode(), result, SerialMessage.bb2hex(payloadBytes),
+                getMessageNode(), result, ByteMessage.bb2hex(payloadBytes),
                 CommandClass.getCommandClass(transactionCompleteCommandClass & 0xff),
                 CommandClass.getCommandClass(payloadBytes[1] & 0xff),
-                transactionCompleteCommand == UNSET ? "ANY" : SerialMessage.b2hex(transactionCompleteCommand),
-                SerialMessage.b2hex(payloadBytes[2]));
+                transactionCompleteCommand == UNSET ? "ANY" : ByteMessage.b2hex(transactionCompleteCommand),
+                ByteMessage.b2hex(payloadBytes[2]));
         if (result) {
             securityTransactionComplete.set(true);
         }
@@ -115,9 +115,9 @@ public class SecurityEncapsulatedSerialMessage extends SerialMessage {
 
     /**
      * @return the original message that was encapsulated, or null if this
-     *         {@link SerialMessage} is not a {@link ZWaveSecurityCommandClass} encapsulated message type
+     *         {@link ByteMessage} is not a {@link ZWaveSecurityCommandClass} encapsulated message type
      */
-    public SerialMessage getMessageBeingEncapsulated() {
+    public ByteMessage getMessageBeingEncapsulated() {
         return messageBeingEncapsulated;
     }
 

@@ -13,8 +13,8 @@ import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 
 import org.junit.Test;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
-import org.openhab.binding.zwave.internal.protocol.serialmessage.RequestNodeInfoMessageClass;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
+import org.openhab.binding.zwave.internal.protocol.messages.RequestNodeInfoMessageClass;
 
 /**
  * Test cases for RequestNodeInfoMessageClass message.
@@ -28,7 +28,7 @@ public class RequestNodeInfoMessageClassTest {
     public void doRequest() {
         byte[] expectedResponse = { 1, 4, 0, 96, 12, -105 };
 
-        SerialMessage msg;
+        ByteMessage msg;
         RequestNodeInfoMessageClass handler = new RequestNodeInfoMessageClass();
 
         msg = handler.doRequest(12);

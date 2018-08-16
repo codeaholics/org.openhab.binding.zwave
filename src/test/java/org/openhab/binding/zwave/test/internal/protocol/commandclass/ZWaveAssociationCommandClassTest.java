@@ -13,7 +13,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 
 import org.junit.Test;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveAlarmSensorCommandClass;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveAssociationCommandClass;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveCommandClass.CommandClass;
@@ -28,7 +28,7 @@ public class ZWaveAssociationCommandClassTest extends ZWaveCommandClassTest {
     @Test
     public void getAssociationMessage() {
         ZWaveAssociationCommandClass cls = (ZWaveAssociationCommandClass) getCommandClass(CommandClass.ASSOCIATION);
-        SerialMessage msg;
+        ByteMessage msg;
 
         byte[] expectedResponseV1 = { 1, 10, 0, 19, 99, 3, -123, 2, 1, 0, 0, 0 };
         cls.setVersion(1);
@@ -39,7 +39,7 @@ public class ZWaveAssociationCommandClassTest extends ZWaveCommandClassTest {
     @Test
     public void getGroupingsMessage() {
         ZWaveAssociationCommandClass cls = (ZWaveAssociationCommandClass) getCommandClass(CommandClass.ASSOCIATION);
-        SerialMessage msg;
+        ByteMessage msg;
 
         byte[] expectedResponseV1 = { 1, 9, 0, 19, 99, 2, -123, 5, 0, 0, 4 };
         cls.setVersion(1);
@@ -50,7 +50,7 @@ public class ZWaveAssociationCommandClassTest extends ZWaveCommandClassTest {
     @Test
     public void removeAssociationMessage() {
         ZWaveAssociationCommandClass cls = (ZWaveAssociationCommandClass) getCommandClass(CommandClass.ASSOCIATION);
-        SerialMessage msg;
+        ByteMessage msg;
 
         byte[] expectedResponseV1 = { 1, 11, 0, 19, 99, 4, -123, 4, 1, 1, 0, 0, 1 };
         cls.setVersion(1);
@@ -61,7 +61,7 @@ public class ZWaveAssociationCommandClassTest extends ZWaveCommandClassTest {
     @Test
     public void clearAssociationMessage() {
         ZWaveAssociationCommandClass cls = (ZWaveAssociationCommandClass) getCommandClass(CommandClass.ASSOCIATION);
-        SerialMessage msg;
+        ByteMessage msg;
 
         byte[] expectedResponseV1 = { 1, 10, 0, 19, 99, 3, -123, 4, 1, 0, 0, 6 };
         cls.setVersion(1);
@@ -72,7 +72,7 @@ public class ZWaveAssociationCommandClassTest extends ZWaveCommandClassTest {
     @Test
     public void setAssociationMessage() {
         ZWaveAssociationCommandClass cls = (ZWaveAssociationCommandClass) getCommandClass(CommandClass.ASSOCIATION);
-        SerialMessage msg;
+        ByteMessage msg;
 
         byte[] expectedResponseV1 = { 1, 11, 0, 19, 99, 4, -123, 1, 1, 1, 0, 0, 4 };
         cls.setVersion(1);

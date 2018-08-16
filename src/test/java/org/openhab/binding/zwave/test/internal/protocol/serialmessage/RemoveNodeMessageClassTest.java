@@ -13,8 +13,8 @@ import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 
 import org.junit.Test;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
-import org.openhab.binding.zwave.internal.protocol.serialmessage.RemoveNodeMessageClass;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
+import org.openhab.binding.zwave.internal.protocol.messages.RemoveNodeMessageClass;
 
 /**
  * Test cases for RemoveNodeMessageClass message.
@@ -30,7 +30,7 @@ public class RemoveNodeMessageClassTest {
         byte[] expectedResponseStop = { 1, 5, 0, 75, 5, -2, 74 };
 
         RemoveNodeMessageClass handler = new RemoveNodeMessageClass();
-        SerialMessage msg;
+        ByteMessage msg;
 
         msg = handler.doRequestStart();
         assertTrue(Arrays.equals(msg.getMessageBuffer(), expectedResponseStart));

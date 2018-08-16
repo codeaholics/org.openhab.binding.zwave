@@ -13,7 +13,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 
 import org.junit.Test;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveBarrierOperatorCommandClass;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveCommandClass.CommandClass;
 
@@ -28,7 +28,7 @@ public class ZWaveBarrierOperatorCommandClassTest extends ZWaveCommandClassTest 
     public void getValueMessage() {
         ZWaveBarrierOperatorCommandClass cls = (ZWaveBarrierOperatorCommandClass) getCommandClass(
                 CommandClass.BARRIER_OPERATOR);
-        SerialMessage msg;
+        ByteMessage msg;
 
         byte[] expectedResponseV1 = { 1, 9, 0, 19, 99, 2, 102, 2, 0, 0, -32 };
         cls.setVersion(1);
@@ -40,7 +40,7 @@ public class ZWaveBarrierOperatorCommandClassTest extends ZWaveCommandClassTest 
     public void setValueMessage() {
         ZWaveBarrierOperatorCommandClass cls = (ZWaveBarrierOperatorCommandClass) getCommandClass(
                 CommandClass.BARRIER_OPERATOR);
-        SerialMessage msg;
+        ByteMessage msg;
 
         byte[] expectedResponseV1 = { 1, 10, 0, 19, 99, 3, 102, 1, -1, 0, 0, 30 };
         cls.setVersion(1);

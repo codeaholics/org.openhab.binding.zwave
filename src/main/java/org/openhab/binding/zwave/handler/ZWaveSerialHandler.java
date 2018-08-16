@@ -8,19 +8,18 @@
  */
 package org.openhab.binding.zwave.handler;
 
-import static org.openhab.binding.zwave.ZWaveBindingConstants.*;
+import static org.openhab.binding.zwave.ZWaveBindingConstants.CONFIGURATION_PORT;
 
 import java.io.IOException;
 import java.util.TooManyListenersException;
 
-import org.eclipse.smarthome.core.library.types.DecimalType;
 import org.eclipse.smarthome.core.thing.Bridge;
 import org.eclipse.smarthome.core.thing.ChannelUID;
 import org.eclipse.smarthome.core.thing.ThingStatus;
 import org.eclipse.smarthome.core.thing.ThingStatusDetail;
 import org.eclipse.smarthome.core.types.Command;
 import org.openhab.binding.zwave.ZWaveBindingConstants;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,20 +40,13 @@ import gnu.io.UnsupportedCommOperationException;
  *
  * @author Chris Jackson - Initial contribution
  */
-public class ZWaveSerialHandler extends ZWaveControllerHandler {
+public class ZWaveSerialHandler extends ZWaveByteHandler {
 
     private Logger logger = LoggerFactory.getLogger(ZWaveSerialHandler.class);
 
     private String portId;
 
     private SerialPort serialPort;
-
-    private int SOFCount = 0;
-    private int CANCount = 0;
-    private int NAKCount = 0;
-    private int ACKCount = 0;
-    private int OOFCount = 0;
-    private int CSECount = 0;
 
     private static final int SERIAL_RECEIVE_TIMEOUT = 250;
 
@@ -147,20 +139,6 @@ public class ZWaveSerialHandler extends ZWaveControllerHandler {
      */
     private class ZWaveReceiveThread extends Thread implements SerialPortEventListener {
 
-        private final int SEARCH_SOF = 0;
-        private final int SEARCH_LEN = 1;
-        private final int SEARCH_DAT = 2;
-
-        private int rxState = SEARCH_SOF;
-        private int messageLength;
-        private int rxLength;
-        private byte[] rxBuffer;
-
-        private static final int SOF = 0x01;
-        private static final int ACK = 0x06;
-        private static final int NAK = 0x15;
-        private static final int CAN = 0x18;
-
         private final Logger logger = LoggerFactory.getLogger(ZWaveReceiveThread.class);
 
         ZWaveReceiveThread() {
@@ -177,24 +155,6 @@ public class ZWaveSerialHandler extends ZWaveControllerHandler {
         }
 
         /**
-         * Sends 1 byte frame response.
-         *
-         * @param response
-         *            the response code to send.
-         */
-        private void sendResponse(int response) {
-            try {
-                synchronized (serialPort.getOutputStream()) {
-                    serialPort.getOutputStream().write(response);
-                    serialPort.getOutputStream().flush();
-                    logger.trace("Response SENT");
-                }
-            } catch (IOException e) {
-                logger.error(e.getMessage());
-            }
-        }
-
-        /**
          * Run method. Runs the actual receiving process.
          */
         @Override
@@ -202,123 +162,19 @@ public class ZWaveSerialHandler extends ZWaveControllerHandler {
             logger.debug("Starting ZWave thread: Receive");
             try {
                 // Send a NAK to resynchronise communications
-                sendResponse(NAK);
+                nak();
 
                 while (!interrupted()) {
                     int nextByte;
 
                     try {
                         nextByte = serialPort.getInputStream().read();
-
-                        // If byte value is -1, this is a timeout
-                        if (nextByte == -1) {
-                            if (rxState != SEARCH_SOF) {
-                                // If we're not searching for a new frame when we get a timeout, something bad happened
-                                logger.debug("Receive Timeout - Sending NAK");
-                                rxState = SEARCH_SOF;
-                            }
-                            continue;
-                        }
                     } catch (IOException e) {
                         logger.error("Got I/O exception {} during receiving. exiting thread.", e.getLocalizedMessage());
                         break;
                     }
 
-                    switch (rxState) {
-                        case SEARCH_SOF:
-                            switch (nextByte) {
-                                case SOF:
-                                    logger.trace("Received SOF");
-
-                                    // Keep track of statistics
-                                    SOFCount++;
-                                    updateState(new ChannelUID(getThing().getUID(), CHANNEL_SERIAL_SOF),
-                                            new DecimalType(SOFCount));
-                                    rxState = SEARCH_LEN;
-                                    break;
-
-                                case ACK:
-                                    // Keep track of statistics
-                                    ACKCount++;
-                                    updateState(new ChannelUID(getThing().getUID(), CHANNEL_SERIAL_ACK),
-                                            new DecimalType(ACKCount));
-                                    logger.trace("Received ACK");
-                                    break;
-
-                                case NAK:
-                                    // A NAK means the CRC was incorrectly received by the controller
-                                    NAKCount++;
-                                    updateState(new ChannelUID(getThing().getUID(), CHANNEL_SERIAL_NAK),
-                                            new DecimalType(NAKCount));
-                                    logger.debug("Protocol error (NAK), discarding");
-
-                                    // TODO: Add NAK processing
-                                    break;
-
-                                case CAN:
-                                    // The CAN means that the controller dropped the frame
-                                    CANCount++;
-                                    updateState(new ChannelUID(getThing().getUID(), CHANNEL_SERIAL_CAN),
-                                            new DecimalType(CANCount));
-                                    logger.debug("Protocol error (CAN), resending");
-
-                                    // TODO: Add CAN processing (Resend?)
-                                    break;
-
-                                default:
-                                    OOFCount++;
-                                    updateState(new ChannelUID(getThing().getUID(), CHANNEL_SERIAL_OOF),
-                                            new DecimalType(OOFCount));
-                                    logger.debug(String.format("Protocol error (OOF). Got 0x%02X.", nextByte));
-                                    // Let the timeout deal with sending the NAK
-                                    break;
-                            }
-                            break;
-
-                        case SEARCH_LEN:
-                            // Sanity check the frame length
-                            if (nextByte < 4 || nextByte > 64) {
-                                logger.debug("Frame length is out of limits ({})", nextByte);
-
-                                break;
-                            }
-                            messageLength = (nextByte & 0xff) + 2;
-
-                            rxBuffer = new byte[messageLength];
-                            rxBuffer[0] = SOF;
-                            rxBuffer[1] = (byte) nextByte;
-                            rxLength = 2;
-                            rxState = SEARCH_DAT;
-                            break;
-
-                        case SEARCH_DAT:
-                            rxBuffer[rxLength] = (byte) nextByte;
-                            rxLength++;
-
-                            if (rxLength < messageLength) {
-                                break;
-                            }
-
-                            logger.debug("Receive Message = {}", SerialMessage.bb2hex(rxBuffer));
-                            SerialMessage recvMessage = new SerialMessage(rxBuffer);
-                            if (recvMessage.isValid) {
-                                logger.trace("Message is valid, sending ACK");
-                                sendResponse(ACK);
-
-                                incomingMessage(recvMessage);
-                            } else {
-                                CSECount++;
-                                updateState(new ChannelUID(getThing().getUID(), CHANNEL_SERIAL_CSE),
-                                        new DecimalType(CSECount));
-
-                                logger.debug("Message is invalid, discarding");
-                                sendResponse(NAK);
-                            }
-
-                            rxState = SEARCH_SOF;
-                            break;
-                    }
-
+                    handleByte(nextByte);
                 }
             } catch (Exception e) {
                 logger.error("Exception during ZWave thread: Receive {}", e.getMessage());
@@ -330,16 +186,23 @@ public class ZWaveSerialHandler extends ZWaveControllerHandler {
     }
 
     @Override
-    public void sendPacket(SerialMessage serialMessage) {
+    public void sendPacket(ByteMessage serialMessage) {
         byte[] buffer = serialMessage.getMessageBuffer();
+
         if (serialPort == null) {
             logger.debug("NODE {}: Port closed sending REQUEST Message = {}", serialMessage.getMessageNode(),
-                    SerialMessage.bb2hex(buffer));
+                    ByteMessage.bb2hex(buffer));
             return;
         }
 
         logger.debug("NODE {}: Sending REQUEST Message = {}", serialMessage.getMessageNode(),
-                SerialMessage.bb2hex(buffer));
+                ByteMessage.bb2hex(buffer));
+
+        sendBytes(buffer);
+    }
+
+    @Override
+    protected void sendBytes(byte[] buffer) {
 
         try {
             synchronized (serialPort.getOutputStream()) {

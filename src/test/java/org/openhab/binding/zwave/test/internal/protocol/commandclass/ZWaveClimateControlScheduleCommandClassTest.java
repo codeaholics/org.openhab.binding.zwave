@@ -9,7 +9,7 @@
 package org.openhab.binding.zwave.test.internal.protocol.commandclass;
 
 import org.junit.Test;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveClimateControlScheduleCommandClass;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveClimateControlScheduleCommandClass.OverrideType;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveClimateControlScheduleCommandClass.ScheduleState;
@@ -53,7 +53,7 @@ public class ZWaveClimateControlScheduleCommandClassTest extends ZWaveCommandCla
 
         byte[] expectedResponse = {99, 4, 70, 5, 0};
 
-        SerialMessage msg = cls.getScheduleChangedReportMessage((byte) 0);
+        ByteMessage msg = cls.getScheduleChangedReportMessage((byte) 0);
 
         assertArrayEquals(expectedResponse, msg.getMessagePayload());
     }

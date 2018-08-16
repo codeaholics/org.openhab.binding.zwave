@@ -13,7 +13,7 @@ import static org.junit.Assert.*;
 import java.util.Arrays;
 
 import org.junit.Test;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveBinarySensorCommandClass;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveBinarySensorCommandClass.SensorType;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveCommandClass.CommandClass;
@@ -29,7 +29,7 @@ public class ZWaveBinarySensorCommandClassTest extends ZWaveCommandClassTest {
     @Test
     public void getValueMessage() {
         ZWaveBinarySensorCommandClass cls = (ZWaveBinarySensorCommandClass) getCommandClass(CommandClass.SENSOR_BINARY);
-        SerialMessage msg;
+        ByteMessage msg;
 
         byte[] expectedResponseV1 = { 1, 9, 0, 19, 99, 2, 48, 2, 0, 0, -74 };
         cls.setVersion(1);
@@ -40,7 +40,7 @@ public class ZWaveBinarySensorCommandClassTest extends ZWaveCommandClassTest {
     @Test
     public void getValueMessageType() {
         ZWaveBinarySensorCommandClass cls = (ZWaveBinarySensorCommandClass) getCommandClass(CommandClass.SENSOR_BINARY);
-        SerialMessage msg;
+        ByteMessage msg;
 
         byte[] expectedResponseV1 = { 1, 10, 0, 19, 99, 3, 48, 2, 10, 0, 0, -66 };
         cls.setVersion(2);
@@ -51,7 +51,7 @@ public class ZWaveBinarySensorCommandClassTest extends ZWaveCommandClassTest {
     @Test
     public void getSupportedMessage() {
         ZWaveBinarySensorCommandClass cls = (ZWaveBinarySensorCommandClass) getCommandClass(CommandClass.SENSOR_BINARY);
-        SerialMessage msg;
+        ByteMessage msg;
 
         byte[] expectedResponseV2 = { 1, 9, 0, 19, 99, 2, 48, 1, 0, 0, -75 };
         cls.setVersion(2);
@@ -62,7 +62,7 @@ public class ZWaveBinarySensorCommandClassTest extends ZWaveCommandClassTest {
     @Test
     public void reportSupportedSensors() throws Exception {
         byte[] packetData = { 0x01, 0x0A, 0x00, 0x04, 0x00, 0x2F, 0x04, 0x30, 0x04, 0x00, 0x15, (byte) 0xFB };
-        SerialMessage msg = new SerialMessage(packetData);
+        ByteMessage msg = new ByteMessage(packetData);
 
         ZWaveBinarySensorCommandClass cls = (ZWaveBinarySensorCommandClass) getCommandClass(CommandClass.SENSOR_BINARY);
         cls.setVersion(2);

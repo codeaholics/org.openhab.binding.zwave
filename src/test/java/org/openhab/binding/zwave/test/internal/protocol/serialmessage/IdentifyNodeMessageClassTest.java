@@ -13,17 +13,17 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage.SerialMessageClass;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage.SerialMessageType;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage.MessageClass;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage.ByteMessageType;
 import org.openhab.binding.zwave.internal.protocol.ZWaveController;
 import org.openhab.binding.zwave.internal.protocol.ZWaveDeviceClass;
 import org.openhab.binding.zwave.internal.protocol.ZWaveDeviceClass.Basic;
 import org.openhab.binding.zwave.internal.protocol.ZWaveDeviceClass.Generic;
 import org.openhab.binding.zwave.internal.protocol.ZWaveDeviceClass.Specific;
+import org.openhab.binding.zwave.internal.protocol.messages.IdentifyNodeMessageClass;
 import org.openhab.binding.zwave.internal.protocol.ZWaveNode;
-import org.openhab.binding.zwave.internal.protocol.ZWaveSerialMessageException;
-import org.openhab.binding.zwave.internal.protocol.serialmessage.IdentifyNodeMessageClass;
+import org.openhab.binding.zwave.internal.protocol.ZWaveByteMessageException;
 
 /**
  * Test cases for IdentifyNode message.
@@ -46,13 +46,13 @@ public class IdentifyNodeMessageClassTest {
 
     ZWaveNode runIdentifyNodeTest(byte[] packetData) {
         byte[] outgoing = { 0x01, 0x04, 0x00, 0x41, 0x01, (byte) 0xBB };
-        SerialMessage outgoingMsg = new SerialMessage(outgoing);
-        SerialMessage incomingMsg = new SerialMessage(packetData);
+        ByteMessage outgoingMsg = new ByteMessage(outgoing);
+        ByteMessage incomingMsg = new ByteMessage(packetData);
 
         // Check the packet is not corrupted and is a command class request
         assertEquals(true, incomingMsg.isValid);
-        assertEquals(SerialMessageType.Response, incomingMsg.getMessageType());
-        assertEquals(SerialMessageClass.IdentifyNode, incomingMsg.getMessageClass());
+        assertEquals(ByteMessageType.Response, incomingMsg.getMessageType());
+        assertEquals(MessageClass.IdentifyNode, incomingMsg.getMessageClass());
 
         // Mock the controller so we return the node
         ZWaveController controller = Mockito.mock(ZWaveController.class);
@@ -95,7 +95,7 @@ public class IdentifyNodeMessageClassTest {
         IdentifyNodeMessageClass handler = new IdentifyNodeMessageClass();
         try {
             handler.handleResponse(controller, outgoingMsg, incomingMsg);
-        } catch (ZWaveSerialMessageException e) {
+        } catch (ZWaveByteMessageException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }

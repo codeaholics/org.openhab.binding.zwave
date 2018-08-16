@@ -21,9 +21,9 @@ import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage.SerialMessageClass;
-import org.openhab.binding.zwave.internal.protocol.SerialMessage.SerialMessageType;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage.MessageClass;
+import org.openhab.binding.zwave.internal.protocol.ByteMessage.ByteMessageType;
 import org.openhab.binding.zwave.internal.protocol.ZWaveController;
 import org.openhab.binding.zwave.internal.protocol.ZWaveDeviceClass;
 import org.openhab.binding.zwave.internal.protocol.ZWaveDeviceClass.Basic;
@@ -31,7 +31,7 @@ import org.openhab.binding.zwave.internal.protocol.ZWaveDeviceClass.Generic;
 import org.openhab.binding.zwave.internal.protocol.ZWaveDeviceClass.Specific;
 import org.openhab.binding.zwave.internal.protocol.ZWaveEndpoint;
 import org.openhab.binding.zwave.internal.protocol.ZWaveNode;
-import org.openhab.binding.zwave.internal.protocol.ZWaveSerialMessageException;
+import org.openhab.binding.zwave.internal.protocol.ZWaveByteMessageException;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveCommandClass;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveCommandClass.CommandClass;
 import org.openhab.binding.zwave.internal.protocol.commandclass.ZWaveMultiInstanceCommandClass;
@@ -54,12 +54,12 @@ import org.openhab.binding.zwave.internal.protocol.event.ZWaveEvent;
 public class ZWaveMultiInstanceCommandClassTest extends ZWaveCommandClassTest {
 
     protected List<ZWaveEvent> processMessage(byte[] packetData) {
-        SerialMessage msg = new SerialMessage(packetData);
+        ByteMessage msg = new ByteMessage(packetData);
 
         // Check the packet is not corrupted and is a command class request
         assertEquals(true, msg.isValid);
-        assertEquals(SerialMessageType.Request, msg.getMessageType());
-        assertEquals(SerialMessageClass.ApplicationCommandHandler, msg.getMessageClass());
+        assertEquals(ByteMessageType.Request, msg.getMessageType());
+        assertEquals(MessageClass.ApplicationCommandHandler, msg.getMessageClass());
 
         try {
             // This method only handles MULTI_INSTANCE
@@ -111,7 +111,7 @@ public class ZWaveMultiInstanceCommandClassTest extends ZWaveCommandClassTest {
             }
 
             cls.handleApplicationCommandRequest(msg, 4, 0);
-        } catch (ZWaveSerialMessageException e) {
+        } catch (ZWaveByteMessageException e) {
             fail("Out of bounds exception processing data");
         }
 
@@ -142,7 +142,7 @@ public class ZWaveMultiInstanceCommandClassTest extends ZWaveCommandClassTest {
     public void getMultiChannelCapabilityGetMessage() {
         ZWaveMultiInstanceCommandClass cls = (ZWaveMultiInstanceCommandClass) getCommandClass(
                 CommandClass.MULTI_INSTANCE);
-        SerialMessage msg;
+        ByteMessage msg;
 
         byte[] expectedResponseV1 = { 1, 10, 0, 19, 99, 3, 96, 9, 1, 0, 0, -18 };
         cls.setVersion(1);
@@ -160,7 +160,7 @@ public class ZWaveMultiInstanceCommandClassTest extends ZWaveCommandClassTest {
     public void getMultiChannelEndpointGetMessage() {
         ZWaveMultiInstanceCommandClass cls = (ZWaveMultiInstanceCommandClass) getCommandClass(
                 CommandClass.MULTI_INSTANCE);
-        SerialMessage msg;
+        ByteMessage msg;
 
         byte[] expectedResponseV1 = { 1, 9, 0, 19, 99, 2, 96, 7, 0, 0, -29 };
         cls.setVersion(1);
@@ -203,10 +203,10 @@ public class ZWaveMultiInstanceCommandClassTest extends ZWaveCommandClassTest {
             e.printStackTrace();
         }
 
-        SerialMessage msg = new SerialMessage(packetData);
+        ByteMessage msg = new ByteMessage(packetData);
         try {
             cls.handleApplicationCommandRequest(msg, 4, 0);
-        } catch (ZWaveSerialMessageException e) {
+        } catch (ZWaveByteMessageException e) {
         }
 
         assertEquals(Basic.NOT_KNOWN, endpointDeviceClass.getBasicDeviceClass());
